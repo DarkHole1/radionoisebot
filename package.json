@@ -1,4 +1,8 @@
 {
+  "main": "src/index-librorum-prohibitorum.ts",
+  "scripts": {
+    "start": "ts-node ."
+  },
   "dependencies": {
     "@types/node": "^20.2.1",
     "grammy": "^1.16.0",
