@@ -11,6 +11,7 @@
     "grammy": "^1.16.0",
     "shikimori": "^1.0.2",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "zod": "^3.21.4"
   }
 }
