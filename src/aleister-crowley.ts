@@ -28,7 +28,7 @@ treeDiagram.get('/oauth', async (req, res) => {
         {
             headers: {
                 ...form.getHeaders(),
-                'User-Agent': 'Radio Noise Bot'
+                'User-Agent': config.shiki.name
             }
         }
     )
