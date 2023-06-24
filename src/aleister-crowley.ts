@@ -22,8 +22,8 @@ treeDiagram.get('/oauth', async (req, res) => {
         return res.redirect('/wrong.html')
     }
 
-    console.log('Get code')
     const { id, code } = req.query
+    console.log('Get code %s %s', id, code)
     const form = new FormData();
     form.append('grant_type', 'authorization_code')
     form.append('client_id', config.shiki.client_id)
