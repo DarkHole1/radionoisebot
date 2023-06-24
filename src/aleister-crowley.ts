@@ -1,12 +1,13 @@
 import axios from "axios"
 import FormData from 'form-data'
 import { Router } from "express"
-import { Composer } from "grammy"
+import { Composer, InlineKeyboard } from "grammy"
 import { config } from "./config"
 import { RawTokenResponse } from "./models/token-response"
 import { RawTokens } from "./models/tokens"
 import { readFileSync } from "fs"
 import { writeFile } from "fs/promises"
+import { guard, isPrivateChat } from "grammy-guard"
 
 export const aleister = new Composer
 export const treeDiagram = Router()
@@ -53,3 +54,11 @@ treeDiagram.get('/oauth', async (req, res) => {
     await writeFile('data/tokens.json', JSON.stringify(tokens))
     return res.redirect('/success.html')
 })
+
+aleister.command(
+    'shiki',
+    guard(isPrivateChat),
+    ctx => ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
+        reply_markup: new InlineKeyboard().url('Кнопк', `https://shikimori.me/oauth/authorize?client_id=F6s8z_R8j53KECTldG7IWBlH9FpjlrYnRqzhgcJrGOs&redirect_uri=https%3A%2F%2Fradionoise.darkhole.space%2Foauth?id=${ctx.from!.id}&response_type=code&scope=user_rates`)
+    })
+)

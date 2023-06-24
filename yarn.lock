@@ -228,6 +228,11 @@ call-bind@^1.0.0:
     function-bind "^1.1.1"
     get-intrinsic "^1.0.2"
 
+callback-data@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/callback-data/-/callback-data-1.0.2.tgz#c0fa72cf079f5d0dd30ed59314bfacf1797a6c36"
+  integrity sha512-rDEvpiVbZKaPwD65D3opWLYFgmsG9e5V8iidQPfAcLp5CTrVQ1ITGmd6P9+xmYTknRx+ChL8h2TZ0q9zULnuYA==
+
 combined-stream@^1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.8.tgz#c3d45a8b34fd730631a110a8a2520682b31d5a7f"
@@ -409,6 +414,13 @@ get-intrinsic@^1.0.2:
     has "^1.0.3"
     has-proto "^1.0.1"
     has-symbols "^1.0.3"
+
+grammy-guard@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/grammy-guard/-/grammy-guard-0.5.0.tgz#de2cb448f627fb9861648354f604ad6406aad475"
+  integrity sha512-vGqrEJPpm5XnaTkklkb/luLdo+qNZX78Fr9CwLdPFEUymYByqlxU/h+NKEmzsNHzC9lc+rS8oR+xQo1Wo5Ogxg==
+  dependencies:
+    callback-data "^1.0.0"
 
 grammy@^1.16.0:
   version "1.16.0"
