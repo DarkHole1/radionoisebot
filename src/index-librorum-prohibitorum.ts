@@ -1,6 +1,6 @@
-import { Bot } from "grammy"
+import { Bot, InlineKeyboard } from "grammy"
 import { AnimeShort, API, SHIKIMORI_URL } from "shikimori"
-import { aleister, treeDiagram } from "./aleister-crowley"
+import { aleister, getAuthorizedAPI, tokens, treeDiagram } from "./aleister-crowley"
 import { config } from "./config"
 import express from 'express'
 import path from 'path'
@@ -46,12 +46,58 @@ bot.on('inline_query', async ctx => {
             input_message_content: {
                 message_text: anime.name + ' / ' + anime.russian + '\n' + SHIKIMORI_URL + anime.url
             },
+            reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:${anime.id}`),
             url: SHIKIMORI_URL + anime.url,
             hide_url: true
         }
     }), {
         next_offset: nextOffset
     })
+})
+
+bot.callbackQuery(/add-planned:(\d+)/, async ctx => {
+    const id = ctx.from.id
+    const anime_id = parseInt(ctx.match[1])
+
+    const shiki = await getAuthorizedAPI(id)
+    if (!shiki) {
+        await ctx.answerCallbackQuery('Кажись ваш аккаунт супер не присоединён к шикимори')
+        return
+    }
+
+    try {
+        const me = await shiki.users.whoami()
+        if (!me) {
+            await ctx.answerCallbackQuery('Кажись ваш аккаунт супер не присоединён к шикимори')
+            return
+        }
+
+        let rates = await shiki.userRates.get({
+            user_id: me.id,
+            target_type: 'Anime',
+            target_id: anime_id
+        })
+
+        if (rates.length != 0) {
+            if (!me) {
+                await ctx.answerCallbackQuery('У вас уже есть это аниме в списке')
+                return
+            }
+        }
+
+        await shiki.userRates.create({
+            target_id: anime_id,
+            target_type: 'Anime',
+            user_id: me.id,
+            status: 'planned'
+        })
+
+        await ctx.answerCallbackQuery('Успешно добавили в список :3')
+        return
+    } catch (e) {
+        console.error(e)
+    }
+    await ctx.answerCallbackQuery('Что-то пошло не так')
 })
 
 bot.use(aleister)

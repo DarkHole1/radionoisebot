@@ -8,6 +8,7 @@ import { RawTokens } from "./models/tokens"
 import { readFileSync } from "fs"
 import { writeFile } from "fs/promises"
 import { guard, isPrivateChat } from "grammy-guard"
+import { API } from "shikimori"
 
 export const aleister = new Composer
 export const treeDiagram = Router()
@@ -44,7 +45,7 @@ treeDiagram.get('/oauth', async (req, res) => {
         }
     )
 
-    if(response.status != 200) {
+    if (response.status != 200) {
         console.log(response.data)
         return res.redirect('/wrong.html')
     }
@@ -72,3 +73,57 @@ aleister.command(
         reply_markup: new InlineKeyboard().url('Кнопк', `https://shikimori.me/oauth/authorize?client_id=F6s8z_R8j53KECTldG7IWBlH9FpjlrYnRqzhgcJrGOs&redirect_uri=https%3A%2F%2Fradionoise.darkhole.space%2Foauth?id=${ctx.from!.id}&response_type=code&scope=user_rates`)
     })
 )
+
+export async function getAuthorizedAPI(id: number) {
+    let token = tokens[id]
+    if (!token) {
+        return null
+    }
+    const now = Date.now() / 1000
+    if (token.valid_until < now) {
+        const form = new FormData();
+        form.append('grant_type', 'refresh_token')
+        form.append('client_id', 'CLIENT_ID')
+        form.append('client_secret', 'CLIENT_SECRET')
+        form.append('refresh_token', 'REFRESH_TOKEN')
+
+        const response = await axios.post(
+            'https://shikimori.me/oauth/token',
+            form,
+            {
+                headers: {
+                    ...form.getHeaders(),
+                    'User-Agent': 'APPLICATION_NAME'
+                },
+                validateStatus: status => true
+            }
+        )
+
+        if (response.status != 200) {
+            console.log(response.data)
+            return null
+        }
+
+        console.log('Parsing token')
+        const parsed = RawTokenResponse.safeParse(response.data)
+        if (!parsed.success) {
+            console.log(parsed)
+            return null
+        }
+
+        token = tokens[id] = {
+            access_token: parsed.data.access_token,
+            refresh_token: parsed.data.refresh_token,
+            valid_until: parsed.data.created_at + parsed.data.expires_in
+        }
+        await writeFile('data/tokens.json', JSON.stringify(tokens))
+    }
+
+    return new API({
+        token: token.access_token,
+        userAgent: config.shiki.name,
+        axios: {
+            headers: { "Accept-Encoding": "*" }
+        }
+    })
+}
