@@ -1,8 +1,7 @@
-import { readFileSync } from "fs";
-import { Bot } from "grammy";
-import { AnimeShort, API, SHIKIMORI_URL } from "shikimori";
+import { Bot } from "grammy"
+import { AnimeShort, API, SHIKIMORI_URL } from "shikimori"
+import { config } from "./config"
 
-const config = JSON.parse(readFileSync("./config.json", { encoding: "utf-8" }))
 const shikimori = new API({
     axios: {
         headers: { "Accept-Encoding": "*" }
