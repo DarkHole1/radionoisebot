@@ -31,38 +31,38 @@ treeDiagram.get('/oauth', async (req, res) => {
     form.append('code', code)
     form.append('redirect_uri', 'https://radionoise.darkhole.space/oauth')
 
-    try {
+    console.log('Start fetching token')
+    const response = await axios.post(
+        'https://shikimori.me/oauth/token',
+        form,
+        {
+            headers: {
+                ...form.getHeaders(),
+                'User-Agent': config.shiki.name
+            },
+            validateStatus: status => true
+        }
+    )
 
-        console.log('Start fetching token')
-        const response = await axios.post(
-            'https://shikimori.me/oauth/token',
-            form,
-            {
-                headers: {
-                    ...form.getHeaders(),
-                    'User-Agent': config.shiki.name
-                }
-            }
-        )
-    
-        console.log('Parsing token')
-        const parsed = RawTokenResponse.safeParse(response.data)
-        if (!parsed.success) {
-            return res.redirect('/wrong.html')
-        }
-    
-        tokens[id] = {
-            access_token: parsed.data.access_token,
-            refresh_token: parsed.data.refresh_token,
-            valid_until: parsed.data.created_at + parsed.data.expires_in
-        }
-        console.log('Saving tokens')
-        await writeFile('data/tokens.json', JSON.stringify(tokens))
-        return res.redirect('/success.html')
-    } catch(e) {
-        console.error(e)
+    if(response.status != 200) {
+        console.log(response.data)
+        return res.redirect('/wrong.html')
     }
-    return res.redirect('/wrong.html')
+
+    console.log('Parsing token')
+    const parsed = RawTokenResponse.safeParse(response.data)
+    if (!parsed.success) {
+        return res.redirect('/wrong.html')
+    }
+
+    tokens[id] = {
+        access_token: parsed.data.access_token,
+        refresh_token: parsed.data.refresh_token,
+        valid_until: parsed.data.created_at + parsed.data.expires_in
+    }
+    console.log('Saving tokens')
+    await writeFile('data/tokens.json', JSON.stringify(tokens))
+    return res.redirect('/success.html')
 })
 
 aleister.command(
