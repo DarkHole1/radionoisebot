@@ -3,6 +3,7 @@ import { AnimeShort, API, SHIKIMORI_URL } from "shikimori"
 import { config } from "./config"
 
 const shikimori = new API({
+    userAgent: config.shiki.name,
     axios: {
         headers: { "Accept-Encoding": "*" }
     }
