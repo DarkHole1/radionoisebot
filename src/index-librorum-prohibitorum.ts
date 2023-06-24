@@ -77,7 +77,8 @@ bot.callbackQuery(/add-planned:(\d+)/, async ctx => {
             target_type: 'Anime',
             target_id: anime_id
         })
-
+        
+        console.log('%s %s %o', me.id, anime_id, rates)
         if (rates.length != 0) {
             if (!me) {
                 await ctx.answerCallbackQuery('У вас уже есть это аниме в списке')
