@@ -1,6 +1,6 @@
 import { Bot, InlineKeyboard } from "grammy"
 import { AnimeShort, API, SHIKIMORI_URL } from "shikimori"
-import { aleister, getAuthorizedAPI, tokens, treeDiagram } from "./aleister-crowley"
+import { aleister, getAuthorizedAPI, treeDiagram } from "./aleister-crowley"
 import { config } from "./config"
 import express from 'express'
 import path from 'path'
