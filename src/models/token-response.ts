@@ -8,3 +8,4 @@ export const RawTokenResponse = z.object({
     scope: z.string(),
     created_at: z.number()
 })
+export type RawTokenResponse = z.infer<typeof RawTokenResponse>

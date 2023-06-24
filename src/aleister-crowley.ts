@@ -3,6 +3,7 @@ import FormData from 'form-data'
 import { Router } from "express"
 import { Composer } from "grammy"
 import { config } from "./config"
+import { RawTokenResponse } from "./models/token-response"
 
 export const aleister = new Composer
 export const treeDiagram = Router()
@@ -12,7 +13,7 @@ treeDiagram.get('/oauth', async (req, res) => {
         return res.redirect('/')
     }
     if (!req.query.id) {
-        return res.redirect('/wrong')
+        return res.redirect('/wrong.html')
     }
 
     const form = new FormData();
@@ -33,5 +34,10 @@ treeDiagram.get('/oauth', async (req, res) => {
         }
     )
 
+    const parsed = RawTokenResponse.safeParse(response.data)
+    if(!parsed.success) {
+        return res.redirect('/wrong.html')
+    }
+    
     // TODO
 })
