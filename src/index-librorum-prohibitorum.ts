@@ -1,6 +1,9 @@
 import { Bot } from "grammy"
 import { AnimeShort, API, SHIKIMORI_URL } from "shikimori"
+import { aleister, treeDiagram } from "./aleister-crowley"
 import { config } from "./config"
+import express from 'express'
+import path from 'path'
 
 const shikimori = new API({
     userAgent: config.shiki.name,
@@ -51,6 +54,13 @@ bot.on('inline_query', async ctx => {
     })
 })
 
+bot.use(aleister)
+
+const app = express()
+app.use(treeDiagram)
+app.use(express.static(path.resolve('static')))
+
+app.listen(9086)
 bot.start()
 
 function getAbsoluteImage(anime: AnimeShort) {
