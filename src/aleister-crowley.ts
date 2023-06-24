@@ -29,7 +29,7 @@ treeDiagram.get('/oauth', async (req, res) => {
     form.append('client_id', config.shiki.client_id)
     form.append('client_secret', config.shiki.client_secret)
     form.append('code', code)
-    form.append('redirect_uri', 'https://radionoise.darkhole.space/oauth')
+    form.append('redirect_uri', 'https://radionoise.darkhole.space/oauth?id=' + id)
 
     console.log('Start fetching token')
     const response = await axios.post(
