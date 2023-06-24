@@ -78,12 +78,9 @@ bot.callbackQuery(/add-planned:(\d+)/, async ctx => {
             target_id: anime_id
         })
         
-        console.log('%s %s %o', me.id, anime_id, rates)
         if (rates.length != 0) {
-            if (!me) {
-                await ctx.answerCallbackQuery('У вас уже есть это аниме в списке')
-                return
-            }
+            await ctx.answerCallbackQuery('У вас уже есть это аниме в списке')
+            return
         }
 
         await shiki.userRates.create({
