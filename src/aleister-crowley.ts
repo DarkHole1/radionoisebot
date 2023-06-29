@@ -81,11 +81,12 @@ export async function getAuthorizedAPI(id: number) {
     }
     const now = Date.now() / 1000
     if (token.valid_until < now) {
+        console.log('Refreshing token')
         const form = new FormData();
         form.append('grant_type', 'refresh_token')
-        form.append('client_id', 'CLIENT_ID')
-        form.append('client_secret', 'CLIENT_SECRET')
-        form.append('refresh_token', 'REFRESH_TOKEN')
+        form.append('client_id', config.shiki.client_id)
+        form.append('client_secret', config.shiki.client_secret)
+        form.append('refresh_token', token.refresh_token)
 
         const response = await axios.post(
             'https://shikimori.me/oauth/token',
@@ -93,7 +94,7 @@ export async function getAuthorizedAPI(id: number) {
             {
                 headers: {
                     ...form.getHeaders(),
-                    'User-Agent': 'APPLICATION_NAME'
+                    'User-Agent': config.shiki.name
                 },
                 validateStatus: status => true
             }
