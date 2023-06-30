@@ -1,6 +1,6 @@
 import { Bot, InlineKeyboard } from "grammy"
 import { AnimeShort, API, SHIKIMORI_URL } from "shikimori"
-import { aleister, getAuthorizedAPI, treeDiagram } from "./aleister-crowley"
+import { aleister, getAuthorizedAPI, loggedIn, treeDiagram } from "./aleister-crowley"
 import { config } from "./config"
 import express from 'express'
 import path from 'path'
@@ -51,7 +51,11 @@ bot.on('inline_query', async ctx => {
             hide_url: true
         }
     }), {
-        next_offset: nextOffset
+        next_offset: nextOffset,
+        button: loggedIn(ctx.from.id) ? {
+            text: "Войти в шики",
+            start_parameter: "shiki" 
+        } : undefined
     })
 })
 

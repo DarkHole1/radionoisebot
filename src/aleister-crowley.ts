@@ -9,6 +9,7 @@ import { readFileSync } from "fs"
 import { writeFile } from "fs/promises"
 import { guard, isPrivateChat } from "grammy-guard"
 import { API } from "shikimori"
+import { number } from "zod"
 
 export const aleister = new Composer
 export const treeDiagram = Router()
@@ -25,7 +26,7 @@ treeDiagram.get('/oauth', async (req, res) => {
 
     const { id, code } = req.query
     console.log('Get code %s %s', id, code)
-    const form = new FormData();
+    const form = new FormData()
     form.append('grant_type', 'authorization_code')
     form.append('client_id', config.shiki.client_id)
     form.append('client_secret', config.shiki.client_secret)
@@ -74,6 +75,16 @@ aleister.command(
     })
 )
 
+aleister.command(
+    'start',
+    guard(isPrivateChat)
+).filter(
+    ctx => ctx.match == 'shiki',
+    ctx => ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
+        reply_markup: new InlineKeyboard().url('Кнопк', `https://shikimori.me/oauth/authorize?client_id=F6s8z_R8j53KECTldG7IWBlH9FpjlrYnRqzhgcJrGOs&redirect_uri=https%3A%2F%2Fradionoise.darkhole.space%2Foauth?id=${ctx.from!.id}&response_type=code&scope=user_rates`)
+    })
+)
+
 export async function getAuthorizedAPI(id: number) {
     let token = tokens[id]
     if (!token) {
@@ -82,7 +93,7 @@ export async function getAuthorizedAPI(id: number) {
     const now = Date.now() / 1000
     if (token.valid_until < now) {
         console.log('Refreshing token')
-        const form = new FormData();
+        const form = new FormData()
         form.append('grant_type', 'refresh_token')
         form.append('client_id', config.shiki.client_id)
         form.append('client_secret', config.shiki.client_secret)
@@ -127,4 +138,8 @@ export async function getAuthorizedAPI(id: number) {
             headers: { "Accept-Encoding": "*" }
         }
     })
+}
+
+export function loggedIn(id: number) {
+    return id in tokens
 }
