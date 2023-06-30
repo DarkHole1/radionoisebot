@@ -21,7 +21,7 @@ bot.on('inline_query', async ctx => {
         console.log("query is empty. stopping")
         await ctx.answerInlineQuery([], {
             next_offset: '',
-            button: loggedIn(ctx.from.id) ? {
+            button: !loggedIn(ctx.from.id) ? {
                 text: "Войти в шики",
                 start_parameter: "shiki" 
             } : undefined,
