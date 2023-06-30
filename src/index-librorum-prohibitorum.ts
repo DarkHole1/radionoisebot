@@ -55,11 +55,7 @@ bot.on('inline_query', async ctx => {
             hide_url: true
         }
     }), {
-        next_offset: nextOffset,
-        button: loggedIn(ctx.from.id) ? {
-            text: "Войти в шики",
-            start_parameter: "shiki" 
-        } : undefined
+        next_offset: nextOffset
     })
 })
 
