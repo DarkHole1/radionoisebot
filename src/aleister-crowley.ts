@@ -86,6 +86,7 @@ aleister.command(
 )
 
 export async function getAuthorizedAPI(id: number) {
+    console.log('Getting api for ' + id)
     let token = tokens[id]
     if (!token) {
         return null
@@ -141,5 +142,6 @@ export async function getAuthorizedAPI(id: number) {
 }
 
 export function loggedIn(id: number) {
+    console.log('Logged in? ' + id)
     return id in tokens
 }
