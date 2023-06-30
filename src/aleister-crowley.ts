@@ -142,6 +142,6 @@ export async function getAuthorizedAPI(id: number) {
 }
 
 export function loggedIn(id: number) {
-    console.log('Logged in? ' + id)
+    console.log('Logged in? ' + id + ' ' + id in tokens)
     return id in tokens
 }
