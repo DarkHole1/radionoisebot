@@ -24,7 +24,8 @@ bot.on('inline_query', async ctx => {
             button: loggedIn(ctx.from.id) ? {
                 text: "Войти в шики",
                 start_parameter: "shiki" 
-            } : undefined
+            } : undefined,
+            cache_time: 0
         })
         return
     }
