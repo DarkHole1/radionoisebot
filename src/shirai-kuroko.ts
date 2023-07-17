@@ -25,6 +25,16 @@ shirai.on('msg::hashtag', isCreatorGuard)
         }
     )
 
+
+shirai.on('msg:is_automatic_forward', async ctx => {
+    const tags = ctx.entities('hashtag').map(e => e.text)
+    const animes = tags.flatMap(tag => hashToAnime.get(tag) ?? [])
+    if(animes.length == 0) return
+    await ctx.reply(`Аниме:\n${animes.join('\n')}`, {
+        reply_to_message_id: ctx.msg.message_id
+    })
+})
+
 function loadFromFile(): Map<string, string> {
     try {
         const text = readFileSync('data/tags.json', { encoding: 'utf-8' })
