@@ -9,7 +9,6 @@ import { readFileSync } from "fs"
 import { writeFile } from "fs/promises"
 import { guard, isPrivateChat } from "grammy-guard"
 import { API } from "shikimori"
-import { number } from "zod"
 
 export const aleister = new Composer
 export const treeDiagram = Router()
