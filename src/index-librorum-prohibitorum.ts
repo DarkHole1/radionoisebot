@@ -4,6 +4,7 @@ import { aleister, getAuthorizedAPI, loggedIn, treeDiagram } from "./aleister-cr
 import { config } from "./config"
 import express from 'express'
 import path from 'path'
+import { shirai } from "./shirai-kuroko"
 
 const shikimori = new API({
     userAgent: config.shiki.name,
@@ -104,6 +105,7 @@ bot.callbackQuery(/add-planned:(\d+)/, async ctx => {
 })
 
 bot.use(aleister)
+bot.use(shirai)
 
 const app = express()
 app.use(treeDiagram)
