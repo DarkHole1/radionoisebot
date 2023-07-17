@@ -10,10 +10,12 @@ const isCreatorGuard = guard(isUserHasId(369810644))
 
 const hashToAnime = loadFromFile()
 
-shirai.on('msg::hashtag', isCreatorGuard)
+shirai.on('msg::hashtag')
     .filter(
         ctx => !!ctx.msg.reply_to_message,
+        isCreatorGuard,
         async ctx => {
+            console.log('Hmmm')
             const hashtag = ctx.entities('hashtag')[0].text
             const reply = ctx.msg.reply_to_message!
             if (!reply.entities) return
@@ -26,8 +28,9 @@ shirai.on('msg::hashtag', isCreatorGuard)
     )
 
 
-shirai.on('msg:is_automatic_forward', async ctx => {
+shirai.on(':is_automatic_forward', async ctx => {
     const tags = ctx.entities('hashtag').map(e => e.text)
+    console.log('gotcha %s', tags)
     const animes = tags.flatMap(tag => hashToAnime.get(tag) ?? [])
     if(animes.length == 0) return
     await ctx.reply(`Аниме:\n${animes.join('\n')}`, {
