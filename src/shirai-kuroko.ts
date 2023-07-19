@@ -1,4 +1,3 @@
-import e from "express"
 import { readFileSync } from "fs"
 import { writeFile } from "fs/promises"
 import { Composer } from "grammy"
