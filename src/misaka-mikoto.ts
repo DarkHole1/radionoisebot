@@ -67,6 +67,7 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     const saveType: SearchType = parseSaveType(ctx.match[1])
     const taretType = saveType == 'anime' ? 'Anime' : 'Manga'
     const translate = saveType == 'anime' ? 'аниме' : (saveType == 'manga') ? 'манга' : 'ранобэ'
+    const that = saveType == 'manga' ? 'эта' : 'это'
     const anime_id = parseInt(ctx.match[2])
 
     const shiki = await getAuthorizedAPI(id)
@@ -89,7 +90,7 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
         })
 
         if (rates.length != 0) {
-            await ctx.answerCallbackQuery(`У вас уже есть это ${translate} в списке`)
+            await ctx.answerCallbackQuery(`У вас уже есть ${that} ${translate} в списке`)
             return
         }
 
