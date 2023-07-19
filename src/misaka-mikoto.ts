@@ -51,7 +51,7 @@ misaka.on('inline_query', async ctx => {
             input_message_content: {
                 message_text: anime.name + ' / ' + anime.russian + '\n' + SHIKIMORI_URL + anime.url
             },
-            reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:${anime.id}`),
+            reply_markup: searchType == 'anime' ? (new InlineKeyboard().text('Добавить в запланированное', `add-planned:${anime.id}`)) : undefined,
             url: SHIKIMORI_URL + anime.url,
             hide_url: true
         }
