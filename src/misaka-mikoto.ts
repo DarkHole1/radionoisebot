@@ -35,17 +35,6 @@ misaka.on('inline_query', async ctx => {
         return
     }
 
-    let searchType: SearchType = 'anime'
-    if (query.startsWith('m/') || query.startsWith('м/')) {
-        searchType = 'manga'
-        query = query.slice(2)
-    } else if (query.startsWith('r/') || query.startsWith('р/')) {
-        searchType = 'ranobe'
-        query = query.slice(2)
-    } else if (query.startsWith('a/') || query.startsWith('а/')) {
-        searchType = 'anime'
-        query = query.slice(2)
-    }
 
     const page = Number(offset) || 1
     const results = await getSearchResults(searchType, query, page)
@@ -64,7 +53,7 @@ misaka.on('inline_query', async ctx => {
             input_message_content: {
                 message_text: anime.name + ' / ' + anime.russian + '\n' + SHIKIMORI_URL + anime.url
             },
-            reply_markup: searchType == 'anime' ? (new InlineKeyboard().text('Добавить в запланированное', `add-planned:${anime.id}`)) : undefined,
+            reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:${searchType[0]}:${anime.id}`),
             url: SHIKIMORI_URL + anime.url,
             hide_url: true
         }
@@ -73,9 +62,11 @@ misaka.on('inline_query', async ctx => {
     })
 })
 
-misaka.callbackQuery(/add-planned:(\d+)/, async ctx => {
+misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     const id = ctx.from.id
-    const anime_id = parseInt(ctx.match[1])
+    const saveType: SearchType = parseSaveType(ctx.match[1])
+    const taretType = saveType == 'anime' ? 'Anime' : 'Manga'
+    const anime_id = parseInt(ctx.match[2])
 
     const shiki = await getAuthorizedAPI(id)
     if (!shiki) {
@@ -92,7 +83,7 @@ misaka.callbackQuery(/add-planned:(\d+)/, async ctx => {
 
         let rates = await shiki.userRates.get({
             user_id: me.id,
-            target_type: 'Anime',
+            target_type: taretType,
             target_id: anime_id
         })
 
@@ -103,7 +94,7 @@ misaka.callbackQuery(/add-planned:(\d+)/, async ctx => {
 
         await shiki.userRates.create({
             target_id: anime_id,
-            target_type: 'Anime',
+            target_type: taretType,
             user_id: me.id,
             status: 'planned'
         })
@@ -143,4 +134,16 @@ async function getSearchResults(searhType: SearchType, query: string, page = 1) 
                 page
             })
     }
+}
+
+function parseSaveType(match?: string): SearchType {
+    if (!match || match == 'a') {
+        return 'anime'
+    }
+
+    if (match == 'm') {
+        return "manga"
+    }
+
+    return 'ranobe'
 }
