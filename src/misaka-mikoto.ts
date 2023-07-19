@@ -1,11 +1,12 @@
 import { Composer, InlineKeyboard } from "grammy"
-import { AnimeShort, SHIKIMORI_URL } from "shikimori"
+import { AnimeShort, MangaShort, SHIKIMORI_URL } from "shikimori"
 import { getAuthorizedAPI, loggedIn, shikimori } from "./aleister-crowley"
 
 export const misaka = new Composer()
+type SearchType = 'anime' | 'manga' | 'ranobe'
 
 misaka.on('inline_query', async ctx => {
-    const query = ctx.inlineQuery.query
+    let query = ctx.inlineQuery.query
     const offset = ctx.inlineQuery.offset
     console.log('get query "%s" with offset "%s"', query, offset)
     if (query.length == 0) {
@@ -14,22 +15,30 @@ misaka.on('inline_query', async ctx => {
             next_offset: '',
             button: !loggedIn(ctx.from.id) ? {
                 text: "Войти в шики",
-                start_parameter: "shiki" 
+                start_parameter: "shiki"
             } : undefined,
             cache_time: 0
         })
         return
     }
 
-    const page = Number(offset) || 1
-    const animes = await shikimori.animes.get({
-        search: query,
-        limit: 10,
-        page
-    })
+    let searchType: SearchType = 'anime'
+    if (query.startsWith('m/') || query.startsWith('м/')) {
+        searchType = 'manga'
+        query = query.slice(2)
+    } else if (query.startsWith('r/') || query.startsWith('р/')) {
+        searchType = 'ranobe'
+        query = query.slice(2)
+    } else if (query.startsWith('a/') || query.startsWith('а/')) {
+        searchType = 'anime'
+        query = query.slice(2)
+    }
 
-    const nextOffset = animes.length > 0 ? (page + 1).toString() : ''
-    await ctx.answerInlineQuery(animes.map(anime => {
+    const page = Number(offset) || 1
+    const results = await getSearchResults(searchType, query, page)
+
+    const nextOffset = results.length > 0 ? (page + 1).toString() : ''
+    await ctx.answerInlineQuery(results.map(anime => {
         const image = getAbsoluteImage(anime)
         return {
             type: 'article',
@@ -73,7 +82,7 @@ misaka.callbackQuery(/add-planned:(\d+)/, async ctx => {
             target_type: 'Anime',
             target_id: anime_id
         })
-        
+
         if (rates.length != 0) {
             await ctx.answerCallbackQuery('У вас уже есть это аниме в списке')
             return
@@ -94,8 +103,31 @@ misaka.callbackQuery(/add-planned:(\d+)/, async ctx => {
     await ctx.answerCallbackQuery('Что-то пошло не так')
 })
 
-function getAbsoluteImage(anime: AnimeShort) {
+function getAbsoluteImage(anime: AnimeShort | MangaShort) {
     const original = SHIKIMORI_URL + (anime.image.original ?? '/assets/globals/missing_original.jpg')
     const preview = SHIKIMORI_URL + (anime.image.preview ?? '/assets/globals/missing_preview.jpg')
     return { original, preview }
+}
+
+async function getSearchResults(searhType: SearchType, query: string, page = 1) {
+    switch (searhType) {
+        case 'anime':
+            return await shikimori.animes.get({
+                search: query,
+                limit: 10,
+                page
+            })
+        case 'manga':
+            return await shikimori.mangas.get({
+                search: query,
+                limit: 10,
+                page
+            })
+        case 'ranobe':
+            return await shikimori.ranobe.get({
+                search: query,
+                limit: 10,
+                page
+            })
+    }
 }
