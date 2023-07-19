@@ -84,6 +84,24 @@ aleister.command(
     })
 )
 
+const defaultOptions = {
+    userAgent: config.shiki.name,
+    axios: {
+        headers: { "Accept-Encoding": "*" }
+    }
+}
+
+export const shikimori = getUnauthorizedAPI()
+
+export function getUnauthorizedAPI() {
+    return new API({
+        userAgent: config.shiki.name,
+        axios: {
+            headers: { "Accept-Encoding": "*" }
+        }
+    })
+}
+
 export async function getAuthorizedAPI(id: number) {
     console.log('Getting api for ' + id)
     let token = tokens[id]
