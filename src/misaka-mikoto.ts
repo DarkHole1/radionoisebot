@@ -9,6 +9,19 @@ misaka.on('inline_query', async ctx => {
     let query = ctx.inlineQuery.query
     const offset = ctx.inlineQuery.offset
     console.log('get query "%s" with offset "%s"', query, offset)
+    
+    let searchType: SearchType = 'anime'
+    if (query.startsWith('m/') || query.startsWith('м/')) {
+        searchType = 'manga'
+        query = query.slice(2)
+    } else if (query.startsWith('r/') || query.startsWith('р/')) {
+        searchType = 'ranobe'
+        query = query.slice(2)
+    } else if (query.startsWith('a/') || query.startsWith('а/')) {
+        searchType = 'anime'
+        query = query.slice(2)
+    }
+
     if (query.length == 0) {
         console.log("query is empty. stopping")
         await ctx.answerInlineQuery([], {
