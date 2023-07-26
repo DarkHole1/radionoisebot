@@ -94,12 +94,7 @@ const defaultOptions = {
 export const shikimori = getUnauthorizedAPI()
 
 export function getUnauthorizedAPI() {
-    return new API({
-        userAgent: config.shiki.name,
-        axios: {
-            headers: { "Accept-Encoding": "*" }
-        }
-    })
+    return new API(defaultOptions)
 }
 
 export async function getAuthorizedAPI(id: number) {
@@ -151,10 +146,7 @@ export async function getAuthorizedAPI(id: number) {
 
     return new API({
         token: token.access_token,
-        userAgent: config.shiki.name,
-        axios: {
-            headers: { "Accept-Encoding": "*" }
-        }
+        ...defaultOptions
     })
 }
 
