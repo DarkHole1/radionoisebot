@@ -7,6 +7,11 @@ export const RawConfig = z.object({
         client_secret: z.string(),
         name: z.string()
     }),
+    anilist: z.object({
+        client_id: z.string(),
+        client_secret: z.string(),
+        name: z.string()
+    }),
     server: z.object({
         oauth: z.string()
     })

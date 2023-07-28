@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod"
 
 export const RawTokenResponse = z.object({
     access_token: z.string(),
@@ -9,3 +9,8 @@ export const RawTokenResponse = z.object({
     created_at: z.number()
 })
 export type RawTokenResponse = z.infer<typeof RawTokenResponse>
+
+export const RawTokenShortResponse = z.object({
+    access_token: z.string()
+})
+export type RawTokenShortResponse = z.infer<typeof RawTokenShortResponse>

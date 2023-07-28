@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { IUnauthorizedAPI, SearchParams, SearchResult } from './types'
+import { config } from '../config'
+import { RawTokenShortResponse } from '../models/token-response'
+import { ContentType, IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from './types'
 
 const searchQuery = `query ($query: String, $type: MediaType, $page: Int, $format: MediaFormat, $format_not: MediaFormat) {
     Page(page: $page, perPage: 10) {
@@ -23,12 +25,45 @@ const searchQuery = `query ($query: String, $type: MediaType, $page: Int, $forma
     }
   }  
   `
-
+const viewerQuery = `query {
+    Viewer {
+      id
+      name
+    }
+  }
+  `
+const resolveMalIdQuery = `query ($id: Int, $type: MediaType) {
+    Media(idMal: $id, type: $type) {
+      id
+    }
+  }
+  `
+const searchInListQuery = `query ($id: Int, $mediaId: Int) {
+    MediaList(userId: $id, mediaId: $mediaId) {
+      id
+      mediaId
+      media {
+        title {
+          english
+          romaji
+        }
+      }
+    }
+  }
+  `
+const addQuery = `mutation($mediaId: Int) {
+	SaveMediaListEntry(mediaId: $mediaId, status: PLANNING) {
+    id
+    status
+  }
+}`
 const ANILIST_URL = 'https://graphql.anilist.co'
 
-async function makeAPICall(params: { query: string, variables?: unknown }) {
+async function makeAPICall(params: { query: string, variables?: unknown }, token?: string) {
+    const auth = token ? { 'Authorization': 'Bearer ' + token } : {}
     const res = await axios.post(ANILIST_URL, JSON.stringify(params), {
         headers: {
+            ...auth,
             'Content-Type': 'application/json',
             'Accept': 'application/json',
         }
@@ -66,6 +101,105 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
     }
 }
 
+class AuthorizedAPI implements IAuthorizedAPI {
+    private token: string
+
+    constructor(token: string) {
+        this.token = token
+    }
+
+    async resolveMalId(type: ContentType, id: number): Promise<number> {
+        const anilistType = type == 'anime' ? 'ANIME' : 'MANGA'
+        return (await makeAPICall({ query: viewerQuery, variables: { id, type: anilistType } })).data.Media.id
+    }
+
+    async hasTitle({ type, id }: { type: ContentType; id: number }): Promise<boolean> {
+        const me = (await makeAPICall({ query: viewerQuery }, this.token)).data.Viewer
+        if (!me) {
+            throw new Error('Login error')
+        }
+
+        const anilistId = await this.resolveMalId(type, id)
+        const res = (await makeAPICall({
+            query: viewerQuery, variables: {
+                id: me.id,
+                mediaId: anilistId
+            }
+        }, this.token)).data.MediaList
+
+        return res != null
+    }
+
+    async addPlanned({ id, type }: { type: ContentType, id: number }): Promise<void> {
+        const me = (await makeAPICall({ query: viewerQuery })).data.Viewer
+        if (!me) {
+            throw new Error('Login error')
+        }
+
+        const anilistId = await this.resolveMalId(type, id)
+        await makeAPICall({
+            query: addQuery,
+            variables: {
+                mediaId: anilistId
+            }
+        }, this.token)
+    }
+}
+
 export function getUnauthorizedAPI(): IUnauthorizedAPI {
     return new UnauthorizedAPI()
 }
+
+export async function getAuthorizedAPI(token: OAuthToken): Promise<{ api: IAuthorizedAPI | null, token: OAuthToken | null }> {
+    return {
+        api: new AuthorizedAPI(token.access_token),
+        token: null
+    }
+}
+
+export function getOAuthURL(redirect_uri: URL): URL {
+    const result = new URL('https://shikimori.me/oauth/authorize')
+    result.searchParams.append('client_id', config.anilist.client_id)
+    result.searchParams.append('redirect_uri', redirect_uri.toString())
+    result.searchParams.append('response_type', 'code')
+    return result
+}
+
+export async function getToken(redirect_uri: URL, code: string): Promise<OAuthToken | null> {
+    const body = {
+        grant_type: 'authorization_code',
+        client_id: config.shiki.client_id,
+        client_secret: config.shiki.client_secret,
+        code: code,
+        redirect_uri: redirect_uri.toString()
+    }
+
+    console.log('Start fetching token')
+    const response = await axios.post(
+        'https://anilist.co/api/v2/oauth/token',
+        JSON.stringify(body),
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            validateStatus: _status => true
+        }
+    )
+
+    if (response.status != 200) {
+        console.log(response.data)
+        return null
+    }
+
+    console.log('Parsing token')
+    const parsed = RawTokenShortResponse.safeParse(response.data)
+    if (!parsed.success) {
+        return null
+    }
+
+    return {
+        access_token: parsed.data.access_token
+    }
+}
+
