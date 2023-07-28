@@ -1,10 +1,12 @@
 import { Composer, InlineKeyboard } from "grammy"
 import * as shiki from './adapters/shiki'
+import * as anilist from './adapters/anilist'
 import * as aogami from './aogami-pierce'
 import { ContentType } from "./adapters/types"
 
 export const misaka = new Composer()
-const shikimori = shiki.getUnauthorizedAPI()
+const shikimori = anilist.getUnauthorizedAPI()
+// const shikimori = shiki.getUnauthorizedAPI()
 
 misaka.on('inline_query', async ctx => {
     let query = ctx.inlineQuery.query
@@ -52,10 +54,10 @@ misaka.on('inline_query', async ctx => {
         thumbnail_url: result.image.preview,
         thumbnail_width: 120,
         thumbnail_height: 180,
-        title: result.name,
-        description: result.russian,
+        title: result.mainTitle,
+        description: result.secondaryTitle,
         input_message_content: {
-            message_text: `${result.name} / ${result.russian}\n${result.url}`
+            message_text: `${result.mainTitle} / ${result.secondaryTitle}\n${result.url}`
         },
         reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:${searchType[0]}:${result.id}`),
         url: result.url,

@@ -12,8 +12,8 @@ export type SearchResult = {
         preview: string,
         original: string
     },
-    name: string,
-    russian: string,
+    mainTitle: string,
+    secondaryTitle: string,
     url: string
 }
 

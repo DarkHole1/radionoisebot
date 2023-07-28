@@ -43,8 +43,8 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
             return {
                 id: res.id.toString(),
                 image: getAbsoluteImage(res),
-                name: res.name,
-                russian: res.russian,
+                mainTitle: res.name,
+                secondaryTitle: res.russian,
                 url: new URL(res.url, SHIKIMORI_URL).toString()
             }
         })
