@@ -26,4 +26,11 @@ export type GetUnauthorizedAPI = () => IUnauthorizedAPI
 export interface IAuthorizedAPI { }
 export type GetAuthorizedAPI = () => IAuthorizedAPI
 
-export type getOAuthURL = (redirect_uri: URL) => URL
+export type GetOAuthURL = (redirect_uri: URL) => URL
+
+export type OAuthToken = {
+    access_token: string
+    refresh_token?: string,
+    valid_until?: number
+}
+export type GetToken = (redirect_uri: string, code: string) => Promise<OAuthToken | null>
