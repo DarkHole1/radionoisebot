@@ -1,18 +1,17 @@
 import { Composer, InlineKeyboard } from "grammy"
-import { AnimeShort, MangaShort, SHIKIMORI_URL } from "shikimori"
 import { getAuthorizedAPI, loggedIn } from "./aleister-crowley"
 import * as shiki from './adapters/shiki'
+import { ContentType } from "./adapters/types"
 
 export const misaka = new Composer()
 const shikimori = shiki.getUnauthorizedAPI()
-type SearchType = 'anime' | 'manga' | 'ranobe'
 
 misaka.on('inline_query', async ctx => {
     let query = ctx.inlineQuery.query
     const offset = ctx.inlineQuery.offset
     console.log('get query "%s" with offset "%s"', query, offset)
 
-    let searchType: SearchType = 'anime'
+    let searchType: ContentType = 'anime'
     if (query.startsWith('m/') || query.startsWith('м/')) {
         searchType = 'manga'
         query = query.slice(2)
@@ -69,7 +68,7 @@ misaka.on('inline_query', async ctx => {
 
 misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     const id = ctx.from.id
-    const saveType: SearchType = parseSaveType(ctx.match[1])
+    const saveType = parseSaveType(ctx.match[1])
     const taretType = saveType == 'anime' ? 'Anime' : 'Manga'
     const translate = saveType == 'anime' ? 'аниме' : (saveType == 'manga') ? 'манга' : 'ранобэ'
     const that = saveType == 'manga' ? 'эта' : 'это'
@@ -114,7 +113,7 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     await ctx.answerCallbackQuery('Что-то пошло не так')
 })
 
-function parseSaveType(match?: string): SearchType {
+function parseSaveType(match?: string): ContentType {
     if (!match || match == 'a') {
         return 'anime'
     }
