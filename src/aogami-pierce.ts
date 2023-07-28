@@ -1,11 +1,12 @@
 import { RawTokens } from "./models/tokens"
 import * as shiki from './adapters/shiki'
+import * as anilist from './adapters/anilist'
 import { readFileSync } from 'fs'
 import { writeFile } from 'fs/promises'
 
 let tokens = RawTokens.parse(JSON.parse(readFileSync('data/tokens.json', { encoding: 'utf-8' })))
 
-export type SupportedAPI = 'shiki'
+export type SupportedAPI = 'shiki' | 'anilist'
 type SupportedAPIParam = {
     type: SupportedAPI
 }
@@ -17,6 +18,8 @@ export function getUnauthorizedAPI({ type }: SupportedAPIParam) {
     switch (type) {
         case 'shiki':
             return shiki.getUnauthorizedAPI()
+        case 'anilist':
+            return anilist.getUnauthorizedAPI()
     }
 }
 

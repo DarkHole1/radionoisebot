@@ -1,12 +1,9 @@
 import { Composer, InlineKeyboard } from "grammy"
-import * as shiki from './adapters/shiki'
-import * as anilist from './adapters/anilist'
 import * as aogami from './aogami-pierce'
 import { ContentType } from "./adapters/types"
 
 export const misaka = new Composer()
-const shikimori = anilist.getUnauthorizedAPI()
-// const shikimori = shiki.getUnauthorizedAPI()
+const searchAPI = aogami.getUnauthorizedAPI({ type: 'anilist' })
 
 misaka.on('inline_query', async ctx => {
     let query = ctx.inlineQuery.query
@@ -40,7 +37,7 @@ misaka.on('inline_query', async ctx => {
 
 
     const page = Number(offset) || 1
-    const results = await shikimori.search({
+    const results = await searchAPI.search({
         type: searchType,
         query,
         page
