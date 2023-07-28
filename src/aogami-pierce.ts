@@ -25,9 +25,13 @@ export function getUnauthorizedAPI({ type }: SupportedAPIParam) {
 
 export async function getAuthorizedAPI({
     type, id
-}: SupportedAPIParam & IDParam) {
+}: Partial<SupportedAPIParam> & IDParam) {
     const token = tokens[id]
-    switch (type) {
+    if (token.type != type) {
+        return null
+    }
+    const realType = type ?? token.type
+    switch (realType) {
         case 'shiki':
             const { api, token: newToken } = await shiki.getAuthorizedAPI(token)
             if (newToken != null) {
