@@ -48,11 +48,15 @@ export async function getToken({
     switch (type) {
         case 'shiki':
             const token = await shiki.getToken(redirect_uri, code)
-            if(token == null) {
+            if (token == null) {
                 return null
             }
             tokens[id] = token
             await writeFile('data/tokens.json', JSON.stringify(tokens))
             return token
     }
+}
+
+export function loggedIn(id: number) {
+    return id in tokens
 }
