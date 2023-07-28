@@ -26,42 +26,11 @@ treeDiagram.get('/oauth', async (req, res) => {
 
     const { id, code } = req.query
     console.log('Get code %s %s', id, code)
-    const form = new FormData()
-    form.append('grant_type', 'authorization_code')
-    form.append('client_id', config.shiki.client_id)
-    form.append('client_secret', config.shiki.client_secret)
-    form.append('code', code)
-    form.append('redirect_uri', 'https://radionoise.darkhole.space/oauth?id=' + id)
-
-    console.log('Start fetching token')
-    const response = await axios.post(
-        'https://shikimori.me/oauth/token',
-        form,
-        {
-            headers: {
-                ...form.getHeaders(),
-                'User-Agent': config.shiki.name
-            },
-            validateStatus: status => true
-        }
-    )
-
-    if (response.status != 200) {
-        console.log(response.data)
+    const token = await shiki.getToken(getRedirectURI(parseInt(id)), code)
+    if (token == null) {
         return res.redirect('/wrong.html')
     }
-
-    console.log('Parsing token')
-    const parsed = RawTokenResponse.safeParse(response.data)
-    if (!parsed.success) {
-        return res.redirect('/wrong.html')
-    }
-
-    tokens[id] = {
-        access_token: parsed.data.access_token,
-        refresh_token: parsed.data.refresh_token,
-        valid_until: parsed.data.created_at + parsed.data.expires_in
-    }
+    tokens[id] = token
     console.log('Saving tokens')
     await writeFile('data/tokens.json', JSON.stringify(tokens))
     return res.redirect('/success.html')
@@ -101,7 +70,7 @@ export async function getAuthorizedAPI(id: number) {
         return null
     }
     const now = Date.now() / 1000
-    if (token.valid_until < now) {
+    if (token.valid_until && token.valid_until < now) {
         console.log('Refreshing token')
         const form = new FormData()
         form.append('grant_type', 'refresh_token')
