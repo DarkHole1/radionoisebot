@@ -33,4 +33,4 @@ export type OAuthToken = {
     refresh_token?: string,
     valid_until?: number
 }
-export type GetToken = (redirect_uri: string, code: string) => Promise<OAuthToken | null>
+export type GetToken = (redirect_uri: URL, code: string) => Promise<OAuthToken | null>
