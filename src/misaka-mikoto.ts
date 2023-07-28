@@ -3,7 +3,7 @@ import * as aogami from './aogami-pierce'
 import { ContentType } from "./adapters/types"
 
 export const misaka = new Composer()
-const searchAPI = aogami.getUnauthorizedAPI({ type: 'anilist' })
+const searchAPI = aogami.getUnauthorizedAPI({ type: 'shiki' })
 
 misaka.on('inline_query', async ctx => {
     let query = ctx.inlineQuery.query
