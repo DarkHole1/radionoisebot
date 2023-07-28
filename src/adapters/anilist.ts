@@ -158,7 +158,7 @@ export async function getAuthorizedAPI(token: OAuthToken): Promise<{ api: IAutho
 }
 
 export function getOAuthURL(redirect_uri: URL): URL {
-    const result = new URL('https://shikimori.me/oauth/authorize')
+    const result = new URL('https://anilist.co/api/v2/oauth/authorize')
     result.searchParams.append('client_id', config.anilist.client_id)
     result.searchParams.append('redirect_uri', redirect_uri.toString())
     result.searchParams.append('response_type', 'code')
