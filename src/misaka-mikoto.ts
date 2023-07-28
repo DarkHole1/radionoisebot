@@ -73,19 +73,19 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     const that = saveType == 'manga' ? 'эта' : 'это'
     const anime_id = parseInt(ctx.match[2])
 
-    const shiki = await aogami.getAuthorizedAPI({ type: 'shiki', id })
-    if (!shiki) {
-        await ctx.answerCallbackQuery('Кажись ваш аккаунт супер не присоединён к шикимори')
+    const authorizedAPI = await aogami.getAuthorizedAPI({ id })
+    if (!authorizedAPI) {
+        await ctx.answerCallbackQuery('Кажись ваш аккаунт супер не присоединён к шикимори или анилисту')
         return
     }
 
     try {
-        if (await shiki.hasTitle({ type: saveType, id: anime_id })) {
+        if (await authorizedAPI.hasTitle({ type: saveType, id: anime_id })) {
             await ctx.answerCallbackQuery(`У вас уже есть ${that} ${translate} в списке`)
             return
         }
 
-        await shiki.addPlanned({
+        await authorizedAPI.addPlanned({
             type: saveType, id: anime_id
         })
 
