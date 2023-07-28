@@ -9,6 +9,7 @@ import { readFileSync } from "fs"
 import { writeFile } from "fs/promises"
 import { guard, isPrivateChat } from "grammy-guard"
 import { API } from "shikimori"
+import * as shiki from './adapters/shiki'
 
 export const aleister = new Composer
 export const treeDiagram = Router()
@@ -67,20 +68,10 @@ treeDiagram.get('/oauth', async (req, res) => {
 })
 
 aleister.command(
-    'shiki',
+    '/login',
     guard(isPrivateChat),
     ctx => ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
-        reply_markup: new InlineKeyboard().url('Кнопк', `https://shikimori.me/oauth/authorize?client_id=F6s8z_R8j53KECTldG7IWBlH9FpjlrYnRqzhgcJrGOs&redirect_uri=https%3A%2F%2Fradionoise.darkhole.space%2Foauth?id=${ctx.from!.id}&response_type=code&scope=user_rates`)
-    })
-)
-
-aleister.command(
-    'start',
-    guard(isPrivateChat)
-).filter(
-    ctx => ctx.match == 'shiki',
-    ctx => ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
-        reply_markup: new InlineKeyboard().url('Кнопк', `https://shikimori.me/oauth/authorize?client_id=F6s8z_R8j53KECTldG7IWBlH9FpjlrYnRqzhgcJrGOs&redirect_uri=https%3A%2F%2Fradionoise.darkhole.space%2Foauth?id=${ctx.from!.id}&response_type=code&scope=user_rates`)
+        reply_markup: new InlineKeyboard().url('Кнопк', shiki.getOAuthURL(getRedirectURI(ctx.from!.id)).toString())
     })
 )
 
@@ -89,6 +80,12 @@ const defaultOptions = {
     axios: {
         headers: { "Accept-Encoding": "*" }
     }
+}
+
+function getRedirectURI(id: number) {
+    let result = new URL(config.server.oauth)
+    result.searchParams.append('id', id.toString())
+    return result
 }
 
 export const shikimori = getUnauthorizedAPI()
