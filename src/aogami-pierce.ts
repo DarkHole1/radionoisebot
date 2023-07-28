@@ -35,12 +35,22 @@ export async function getAuthorizedAPI({
                 await writeFile('data/tokens.json', JSON.stringify(tokens))
             }
             return api
+
+        case 'anilist':
+            const { api: api2, token: newToken2 } = await shiki.getAuthorizedAPI(token)
+            if (newToken2 != null) {
+                tokens[id] = newToken2
+                await writeFile('data/tokens.json', JSON.stringify(tokens))
+            }
+            return api2
     }
 }
 
 export function getOAuthURL({ type, redirect_uri }: SupportedAPIParam & { redirect_uri: URL }) {
     switch (type) {
         case 'shiki':
+            return shiki.getOAuthURL(redirect_uri)
+        case 'anilist':
             return shiki.getOAuthURL(redirect_uri)
     }
 }
@@ -57,6 +67,14 @@ export async function getToken({
             tokens[id] = token
             await writeFile('data/tokens.json', JSON.stringify(tokens))
             return token
+        case 'anilist':
+            const token2 = await shiki.getToken(redirect_uri, code)
+            if (token2 == null) {
+                return null
+            }
+            tokens[id] = token2
+            await writeFile('data/tokens.json', JSON.stringify(tokens))
+            return token2
     }
 }
 
