@@ -59,7 +59,7 @@ misaka.on('inline_query', async ctx => {
             message_text: `${result.name} / ${result.russian}\n${result.url}`
         },
         reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:${searchType[0]}:${result.id}`),
-        url: SHIKIMORI_URL + result.url,
+        url: result.url,
         hide_url: true
     }
     )), {

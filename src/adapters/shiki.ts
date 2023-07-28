@@ -1,5 +1,6 @@
 import { AnimesGetResponse, AnimeShort, API, MangasGetResponse, MangaShort, SHIKIMORI_URL } from "shikimori"
 import { config } from "../config"
+import { IUnauthorizedAPI, SearchParams, SearchResult } from "./types"
 
 const defaultOptions = {
     userAgent: config.shiki.name,

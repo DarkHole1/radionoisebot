@@ -1,11 +1,11 @@
-type ContentType = 'anime' | 'manga' | 'ranobe'
+export type ContentType = 'anime' | 'manga' | 'ranobe'
 
-type SearchParams = {
+export type SearchParams = {
     query: string,
     type: ContentType,
     page: number
 }
-type SearchResult = {
+export type SearchResult = {
     id: string,
     image: {
         preview: string,
@@ -16,7 +16,7 @@ type SearchResult = {
     url: string
 }
 
-interface IUnauthorizedAPI {
+export interface IUnauthorizedAPI {
     search(params: SearchParams): Promise<SearchResult[]>
 }
-type GetUnauthorizedAPI = () => IUnauthorizedAPI
+export type GetUnauthorizedAPI = () => IUnauthorizedAPI
