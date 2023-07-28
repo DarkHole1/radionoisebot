@@ -3,7 +3,7 @@ import FormData from 'form-data'
 import { AnimesGetResponse, AnimeShort, API, MangasGetResponse, MangaShort, SHIKIMORI_URL } from "shikimori"
 import { config } from "../config"
 import { RawTokenResponse } from "../models/token-response"
-import { IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
+import { IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
 
 const defaultOptions = {
     userAgent: config.shiki.name,
@@ -56,7 +56,57 @@ export function getUnauthorizedAPI(): IUnauthorizedAPI {
     return new UnauthorizedAPI()
 }
 
-function getAuthorizedAPI() { }
+export async function getAuthorizedAPI(token: OAuthToken): Promise<{ api: IAuthorizedAPI | null, token: OAuthToken | null }> {
+    const now = Date.now() / 1000
+    let newToken: OAuthToken | null = null
+
+    if (token.valid_until && token.valid_until < now) {
+        console.log('Refreshing token')
+        const form = new FormData()
+        form.append('grant_type', 'refresh_token')
+        form.append('client_id', config.shiki.client_id)
+        form.append('client_secret', config.shiki.client_secret)
+        form.append('refresh_token', token.refresh_token)
+
+        const response = await axios.post(
+            'https://shikimori.me/oauth/token',
+            form,
+            {
+                headers: {
+                    ...form.getHeaders(),
+                    'User-Agent': config.shiki.name
+                },
+                validateStatus: status => true
+            }
+        )
+
+        if (response.status != 200) {
+            console.log(response.data)
+            return { api: null, token: null }
+        }
+
+        console.log('Parsing token')
+        const parsed = RawTokenResponse.safeParse(response.data)
+        if (!parsed.success) {
+            console.log(parsed)
+            return { api: null, token: null }
+        }
+
+        newToken = {
+            access_token: parsed.data.access_token,
+            refresh_token: parsed.data.refresh_token,
+            valid_until: parsed.data.created_at + parsed.data.expires_in
+        }
+    }
+
+    return {
+        api: new API({
+            token: token.access_token,
+            ...defaultOptions
+        }),
+        token: newToken
+    }
+}
 
 export function getOAuthURL(redirect_uri: URL): URL {
     const result = new URL('https://shikimori.me/oauth/authorize')
