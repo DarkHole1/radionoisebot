@@ -23,7 +23,7 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
             limit: 10,
             page
         }
-        
+
         switch (type) {
             case 'anime':
                 results = await this.shiki.animes.get(args)
@@ -54,7 +54,16 @@ export function getUnauthorizedAPI(): IUnauthorizedAPI {
 }
 
 function getAuthorizedAPI() { }
-function getOAuthURL(base: URL) { }
+
+export function getOAuthURL(redirect_uri: URL): URL {
+    const result = new URL('https://shikimori.me/oauth/authorize')
+    result.searchParams.append('client_id', config.shiki.client_id)
+    result.searchParams.append('redirect_uri', redirect_uri.toString())
+    result.searchParams.append('response_type', 'code')
+    result.searchParams.append('scope', 'user_rates')
+    return result
+}
+
 function getToken(url: string, token: string) { }
 
 function getAbsoluteImage(anime: AnimeShort | MangaShort) {
