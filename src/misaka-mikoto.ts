@@ -114,35 +114,6 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     await ctx.answerCallbackQuery('Что-то пошло не так')
 })
 
-function getAbsoluteImage(anime: AnimeShort | MangaShort) {
-    const original = SHIKIMORI_URL + (anime.image.original ?? '/assets/globals/missing_original.jpg')
-    const preview = SHIKIMORI_URL + (anime.image.preview ?? '/assets/globals/missing_preview.jpg')
-    return { original, preview }
-}
-
-// async function getSearchResults(searhType: SearchType, query: string, page = 1) {
-//     switch (searhType) {
-//         case 'anime':
-//             return await shikimori.animes.get({
-//                 search: query,
-//                 limit: 10,
-//                 page
-//             })
-//         case 'manga':
-//             return await shikimori.mangas.get({
-//                 search: query,
-//                 limit: 10,
-//                 page
-//             })
-//         case 'ranobe':
-//             return await shikimori.ranobe.get({
-//                 search: query,
-//                 limit: 10,
-//                 page
-//             })
-//     }
-// }
-
 function parseSaveType(match?: string): SearchType {
     if (!match || match == 'a') {
         return 'anime'
