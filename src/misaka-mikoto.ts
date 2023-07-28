@@ -1,15 +1,17 @@
 import { Composer, InlineKeyboard } from "grammy"
 import { AnimeShort, MangaShort, SHIKIMORI_URL } from "shikimori"
-import { getAuthorizedAPI, loggedIn, shikimori } from "./aleister-crowley"
+import { getAuthorizedAPI, loggedIn } from "./aleister-crowley"
+import * as shiki from './adapters/shiki'
 
 export const misaka = new Composer()
+const shikimori = shiki.getUnauthorizedAPI()
 type SearchType = 'anime' | 'manga' | 'ranobe'
 
 misaka.on('inline_query', async ctx => {
     let query = ctx.inlineQuery.query
     const offset = ctx.inlineQuery.offset
     console.log('get query "%s" with offset "%s"', query, offset)
-    
+
     let searchType: SearchType = 'anime'
     if (query.startsWith('m/') || query.startsWith('м/')) {
         searchType = 'manga'
@@ -37,27 +39,30 @@ misaka.on('inline_query', async ctx => {
 
 
     const page = Number(offset) || 1
-    const results = await getSearchResults(searchType, query, page)
+    const results = await shikimori.search({
+        type: searchType,
+        query,
+        page
+    })
+    // const results = await getSearchResults(searchType, query, page)
 
     const nextOffset = results.length > 0 ? (page + 1).toString() : ''
-    await ctx.answerInlineQuery(results.map(anime => {
-        const image = getAbsoluteImage(anime)
-        return {
-            type: 'article',
-            id: anime.id.toString(),
-            thumbnail_url: image.preview,
-            thumbnail_width: 120,
-            thumbnail_height: 180,
-            title: anime.name,
-            description: anime.russian,
-            input_message_content: {
-                message_text: anime.name + ' / ' + anime.russian + '\n' + SHIKIMORI_URL + anime.url
-            },
-            reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:${searchType[0]}:${anime.id}`),
-            url: SHIKIMORI_URL + anime.url,
-            hide_url: true
-        }
-    }), {
+    await ctx.answerInlineQuery(results.map(result => ({
+        type: 'article',
+        id: result.id,
+        thumbnail_url: result.image.preview,
+        thumbnail_width: 120,
+        thumbnail_height: 180,
+        title: result.name,
+        description: result.russian,
+        input_message_content: {
+            message_text: `${result.name} / ${result.russian}\n${result.url}`
+        },
+        reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:${searchType[0]}:${result.id}`),
+        url: SHIKIMORI_URL + result.url,
+        hide_url: true
+    }
+    )), {
         next_offset: nextOffset
     })
 })
@@ -115,28 +120,28 @@ function getAbsoluteImage(anime: AnimeShort | MangaShort) {
     return { original, preview }
 }
 
-async function getSearchResults(searhType: SearchType, query: string, page = 1) {
-    switch (searhType) {
-        case 'anime':
-            return await shikimori.animes.get({
-                search: query,
-                limit: 10,
-                page
-            })
-        case 'manga':
-            return await shikimori.mangas.get({
-                search: query,
-                limit: 10,
-                page
-            })
-        case 'ranobe':
-            return await shikimori.ranobe.get({
-                search: query,
-                limit: 10,
-                page
-            })
-    }
-}
+// async function getSearchResults(searhType: SearchType, query: string, page = 1) {
+//     switch (searhType) {
+//         case 'anime':
+//             return await shikimori.animes.get({
+//                 search: query,
+//                 limit: 10,
+//                 page
+//             })
+//         case 'manga':
+//             return await shikimori.mangas.get({
+//                 search: query,
+//                 limit: 10,
+//                 page
+//             })
+//         case 'ranobe':
+//             return await shikimori.ranobe.get({
+//                 search: query,
+//                 limit: 10,
+//                 page
+//             })
+//     }
+// }
 
 function parseSaveType(match?: string): SearchType {
     if (!match || match == 'a') {
