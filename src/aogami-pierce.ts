@@ -27,7 +27,7 @@ export async function getAuthorizedAPI({
     type, id
 }: Partial<SupportedAPIParam> & IDParam) {
     const token = tokens[id]
-    if (token.type != type) {
+    if (type && token.type != type) {
         return null
     }
     const realType = type ?? token.type
