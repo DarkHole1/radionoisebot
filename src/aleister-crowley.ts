@@ -7,7 +7,7 @@ import { RawTokenResponse } from "./models/token-response"
 import { RawTokens } from "./models/tokens"
 import { readFileSync } from "fs"
 import { writeFile } from "fs/promises"
-import { guard, isPrivateChat } from "grammy-guard"
+import { guard, isPrivateChat, reply } from "grammy-guard"
 import { API } from "shikimori"
 import * as shiki from './adapters/shiki'
 
@@ -68,8 +68,8 @@ treeDiagram.get('/oauth', async (req, res) => {
 })
 
 aleister.command(
-    '/login',
-    guard(isPrivateChat),
+    'login',
+    guard(isPrivateChat, reply('Эта команда работает только в личных сообщениях')),
     ctx => ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
         reply_markup: new InlineKeyboard().url('Кнопк', shiki.getOAuthURL(getRedirectURI(ctx.from!.id)).toString())
     })
