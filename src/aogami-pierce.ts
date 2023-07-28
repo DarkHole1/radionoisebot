@@ -31,7 +31,10 @@ export async function getAuthorizedAPI({
         case 'shiki':
             const { api, token: newToken } = await shiki.getAuthorizedAPI(token)
             if (newToken != null) {
-                tokens[id] = newToken
+                tokens[id] = {
+                    type: 'shiki',
+                    ...newToken
+                }
                 await writeFile('data/tokens.json', JSON.stringify(tokens))
             }
             return api
@@ -39,7 +42,10 @@ export async function getAuthorizedAPI({
         case 'anilist':
             const { api: api2, token: newToken2 } = await shiki.getAuthorizedAPI(token)
             if (newToken2 != null) {
-                tokens[id] = newToken2
+                tokens[id] = {
+                    type: 'anilist',
+                    ...newToken2
+                }
                 await writeFile('data/tokens.json', JSON.stringify(tokens))
             }
             return api2
@@ -64,7 +70,10 @@ export async function getToken({
             if (token == null) {
                 return null
             }
-            tokens[id] = token
+            tokens[id] = {
+                type: 'shiki',
+                ...token
+            }
             await writeFile('data/tokens.json', JSON.stringify(tokens))
             return token
         case 'anilist':
@@ -72,7 +81,10 @@ export async function getToken({
             if (token2 == null) {
                 return null
             }
-            tokens[id] = token2
+            tokens[id] = {
+                type: 'anilist',
+                ...token2
+            }
             await writeFile('data/tokens.json', JSON.stringify(tokens))
             return token2
     }
