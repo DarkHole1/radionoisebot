@@ -18,27 +18,21 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
 
     async search({ query, type, page }: SearchParams): Promise<SearchResult[]> {
         let results: (AnimesGetResponse | MangasGetResponse)
+        const args = {
+            search: query,
+            limit: 10,
+            page
+        }
+        
         switch (type) {
             case 'anime':
-                results = await this.shiki.animes.get({
-                    search: query,
-                    limit: 10,
-                    page
-                })
+                results = await this.shiki.animes.get(args)
                 break
             case 'manga':
-                results = await this.shiki.mangas.get({
-                    search: query,
-                    limit: 10,
-                    page
-                })
+                results = await this.shiki.mangas.get(args)
                 break
             case 'ranobe':
-                results = await this.shiki.ranobe.get({
-                    search: query,
-                    limit: 10,
-                    page
-                })
+                results = await this.shiki.ranobe.get(args)
                 break
         }
 
