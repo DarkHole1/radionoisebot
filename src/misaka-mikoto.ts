@@ -1,6 +1,6 @@
 import { Composer, InlineKeyboard } from "grammy"
-import { getAuthorizedAPI, loggedIn } from "./aleister-crowley"
 import * as shiki from './adapters/shiki'
+import * as aogami from './aogami-pierce'
 import { ContentType } from "./adapters/types"
 
 export const misaka = new Composer()
@@ -27,7 +27,7 @@ misaka.on('inline_query', async ctx => {
         console.log("query is empty. stopping")
         await ctx.answerInlineQuery([], {
             next_offset: '',
-            button: !loggedIn(ctx.from.id) ? {
+            button: !aogami.loggedIn(ctx.from.id) ? {
                 text: "Войти в шики",
                 start_parameter: "shiki"
             } : undefined,
@@ -74,35 +74,20 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     const that = saveType == 'manga' ? 'эта' : 'это'
     const anime_id = parseInt(ctx.match[2])
 
-    const shiki = await getAuthorizedAPI(id)
+    const shiki = await aogami.getAuthorizedAPI({ type: 'shiki', id })
     if (!shiki) {
         await ctx.answerCallbackQuery('Кажись ваш аккаунт супер не присоединён к шикимори')
         return
     }
 
     try {
-        const me = await shiki.users.whoami()
-        if (!me) {
-            await ctx.answerCallbackQuery('Кажись ваш аккаунт супер не присоединён к шикимори')
-            return
-        }
-
-        let rates = await shiki.userRates.get({
-            user_id: me.id,
-            target_type: taretType,
-            target_id: anime_id
-        })
-
-        if (rates.length != 0) {
+        if (await shiki.hasTitle({ type: saveType, id: anime_id })) {
             await ctx.answerCallbackQuery(`У вас уже есть ${that} ${translate} в списке`)
             return
         }
 
-        await shiki.userRates.create({
-            target_id: anime_id,
-            target_type: taretType,
-            user_id: me.id,
-            status: 'planned'
+        await shiki.addPlanned({
+            type: saveType, id: anime_id
         })
 
         await ctx.answerCallbackQuery('Успешно добавили в список :3')

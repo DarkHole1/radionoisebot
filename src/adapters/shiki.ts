@@ -3,7 +3,7 @@ import FormData from 'form-data'
 import { AnimesGetResponse, AnimeShort, API, MangasGetResponse, MangaShort, SHIKIMORI_URL } from "shikimori"
 import { config } from "../config"
 import { RawTokenResponse } from "../models/token-response"
-import { IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
+import { ContentType, IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
 
 const defaultOptions = {
     userAgent: config.shiki.name,
@@ -49,6 +49,45 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
             }
         })
         return adaptedResults
+    }
+}
+
+class AuthorizedAPI implements IAuthorizedAPI {
+    private shiki: API
+
+    constructor(token: string) {
+        this.shiki = new API({
+            token, ...defaultOptions
+        })
+    }
+
+    async hasTitle({ type, id }: { type: ContentType; id: number }): Promise<boolean> {
+        const me = await this.shiki.users.whoami()
+        if (!me) {
+            throw new Error('Login error')
+        }
+
+        let rates = await this.shiki.userRates.get({
+            user_id: me.id,
+            target_type: type == 'anime' ? 'Anime' : 'Manga',
+            target_id: id
+        })
+
+        return rates.length != 0
+    }
+
+    async addPlanned({ id, type }: { type: ContentType; id: number }): Promise<void> {
+        const me = await this.shiki.users.whoami()
+        if (!me) {
+            throw new Error('Login error')
+        }
+
+        await this.shiki.userRates.create({
+            target_id: id,
+            target_type: type == 'anime' ? 'Anime' : 'Manga',
+            user_id: me.id,
+            status: 'planned'
+        })
     }
 }
 
@@ -100,10 +139,7 @@ export async function getAuthorizedAPI(token: OAuthToken): Promise<{ api: IAutho
     }
 
     return {
-        api: new API({
-            token: token.access_token,
-            ...defaultOptions
-        }),
+        api: new AuthorizedAPI(token.access_token),
         token: newToken
     }
 }
