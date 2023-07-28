@@ -110,7 +110,7 @@ class AuthorizedAPI implements IAuthorizedAPI {
 
     async resolveMalId(type: ContentType, id: number): Promise<number> {
         const anilistType = type == 'anime' ? 'ANIME' : 'MANGA'
-        return (await makeAPICall({ query: viewerQuery, variables: { id, type: anilistType } })).data.Media.id
+        return (await makeAPICall({ query: resolveMalIdQuery, variables: { id, type: anilistType } })).data.Media.id
     }
 
     async hasTitle({ type, id }: { type: ContentType; id: number }): Promise<boolean> {
@@ -121,7 +121,7 @@ class AuthorizedAPI implements IAuthorizedAPI {
 
         const anilistId = await this.resolveMalId(type, id)
         const res = (await makeAPICall({
-            query: viewerQuery, variables: {
+            query: searchInListQuery, variables: {
                 id: me.id,
                 mediaId: anilistId
             }
