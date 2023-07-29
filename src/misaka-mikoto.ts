@@ -68,7 +68,6 @@ misaka.on('inline_query', async ctx => {
 misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     const id = ctx.from.id
     const saveType = parseSaveType(ctx.match[1])
-    const taretType = saveType == 'anime' ? 'Anime' : 'Manga'
     const translate = saveType == 'anime' ? 'аниме' : (saveType == 'manga') ? 'манга' : 'ранобэ'
     const that = saveType == 'manga' ? 'эта' : 'это'
     const anime_id = parseInt(ctx.match[2])
