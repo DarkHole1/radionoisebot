@@ -66,7 +66,8 @@ async function makeAPICall(params: { query: string, variables?: unknown }, token
             ...auth,
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-        }
+        },
+        validateStatus: _status => true
     })
     return res.data
 }
@@ -109,8 +110,11 @@ class AuthorizedAPI implements IAuthorizedAPI {
     }
 
     async resolveMalId(type: ContentType, id: number): Promise<number> {
+        console.log('Search mal ID %s %s', id, type)
         const anilistType = type == 'anime' ? 'ANIME' : 'MANGA'
-        return (await makeAPICall({ query: resolveMalIdQuery, variables: { id, type: anilistType } })).data.Media.id
+        const res = await makeAPICall({ query: resolveMalIdQuery, variables: { id, type: anilistType } })
+        console.log(res)
+        return res.data.Media.id
     }
 
     async hasTitle({ type, id }: { type: ContentType; id: number }): Promise<boolean> {
@@ -131,7 +135,7 @@ class AuthorizedAPI implements IAuthorizedAPI {
     }
 
     async addPlanned({ id, type }: { type: ContentType, id: number }): Promise<void> {
-        const me = (await makeAPICall({ query: viewerQuery })).data.Viewer
+        const me = (await makeAPICall({ query: viewerQuery }, this.token)).data.Viewer
         if (!me) {
             throw new Error('Login error')
         }
