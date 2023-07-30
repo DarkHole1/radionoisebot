@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { Composer, InlineKeyboard } from "grammy"
+import { Composer, Context, InlineKeyboard } from "grammy"
 import { config } from "./config"
 import { guard, isPrivateChat, reply } from "grammy-guard"
 import * as aogami from './aogami-pierce'
@@ -44,15 +44,25 @@ treeDiagram.get('/oauth', cookieParser(), async (req, res) => {
     return res.redirect('/success.html')
 })
 
+aleister.command('start').filter(
+    ctx => ctx.match == 'login',
+    guard(isPrivateChat, reply('Эта команда работает только в личных сообщениях', { replyToMessage: true })),
+    replyLogin
+)
+
 aleister.command(
     'login',
     guard(isPrivateChat, reply('Эта команда работает только в личных сообщениях', { replyToMessage: true })),
-    ctx => ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
+    replyLogin
+)
+
+function replyLogin(ctx: Context) {
+    return ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
         reply_markup: new InlineKeyboard()
             .url('Shikimori', getLoginURI('shiki', ctx.from!.id).toString())
             .url('Anilist', getLoginURI('anilist', ctx.from!.id).toString())
     })
-)
+}
 
 function getRedirectURI() {
     let result = new URL(config.server.oauth)

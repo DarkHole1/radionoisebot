@@ -28,7 +28,7 @@ misaka.on('inline_query', async ctx => {
             next_offset: '',
             button: !aogami.loggedIn(ctx.from.id) ? {
                 text: "Войти в шики",
-                start_parameter: "shiki"
+                start_parameter: "login"
             } : undefined,
             cache_time: 0
         })
