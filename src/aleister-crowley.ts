@@ -47,15 +47,19 @@ aleister.command(
     guard(isPrivateChat, reply('Эта команда работает только в личных сообщениях', { replyToMessage: true })),
     ctx => ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
         reply_markup: new InlineKeyboard()
-            .url('Shikimori', getRedirectURI('shiki').toString())
-            .url('Anilist', getRedirectURI('anilist').toString())
+            .url('Shikimori', getLoginURI('shiki', ctx.from!.id).toString())
+            .url('Anilist', getRedirectURI('anilist', ctx.from!.id).toString())
     })
 )
 
-function getRedirectURI(base?: aogami.SupportedAPI) {
+function getRedirectURI() {
     let result = new URL(config.server.oauth)
-    if (base) {
-        result.pathname += '/' + base
-    }
+    return result
+}
+
+function getLoginURI(type: aogami.SupportedAPI, id: number) {
+    const result = new URL(config.server.oauth)
+    result.pathname += '/' + type
+    result.searchParams.append('id', id.toString())
     return result
 }
