@@ -168,8 +168,8 @@ export function getOAuthURL(redirect_uri: URL): URL {
 export async function getToken(redirect_uri: URL, code: string): Promise<OAuthToken | null> {
     const body = {
         grant_type: 'authorization_code',
-        client_id: config.shiki.client_id,
-        client_secret: config.shiki.client_secret,
+        client_id: config.anilist.client_id,
+        client_secret: config.anilist.client_secret,
         code: code,
         redirect_uri: redirect_uri.toString()
     }
