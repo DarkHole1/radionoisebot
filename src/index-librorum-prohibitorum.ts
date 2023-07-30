@@ -5,9 +5,11 @@ import express from 'express'
 import path from 'path'
 import { shirai } from "./shirai-kuroko"
 import { misaka } from "./misaka-mikoto"
+import { kakine } from './kakine-teitoku'
 
 const bot = new Bot(config.token)
 
+bot.use(kakine)
 bot.use(misaka)
 bot.use(aleister)
 bot.use(shirai)
