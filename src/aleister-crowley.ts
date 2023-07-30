@@ -3,6 +3,7 @@ import { Composer, InlineKeyboard } from "grammy"
 import { config } from "./config"
 import { guard, isPrivateChat, reply } from "grammy-guard"
 import * as aogami from './aogami-pierce'
+import cookieParser from 'cookie-parser'
 
 export const aleister = new Composer
 export const treeDiagram = Router()
@@ -19,15 +20,16 @@ treeDiagram.get('/oauth/:type', (req, res) => {
     }).toString())
 })
 
-treeDiagram.get('/oauth', async (req, res) => {
+treeDiagram.get('/oauth', cookieParser(), async (req, res) => {
     if (!req.query.code || typeof req.query.code != 'string') {
         return res.redirect('/')
     }
-    if (!req.cookies.id || typeof req.cookies.id != 'string' || !req.query.type || typeof req.query.type != 'string') {
+    if (!req.cookies.id || typeof req.cookies.id != 'string' || !req.cookies.type || typeof req.cookies.type != 'string') {
         return res.redirect('/wrong.html')
     }
 
-    const { id, code, type } = req.cookies
+    const { id, type } = req.cookies
+    const { code } = req.query
     const realType: aogami.SupportedAPI = type == 'anilist' ? 'anilist' : 'shiki'
     console.log('Get code %s %s %s', id, code, type)
     const token = await aogami.getToken({
