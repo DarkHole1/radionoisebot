@@ -48,7 +48,7 @@ aleister.command(
     ctx => ctx.reply('Чтобы авторизироваться нажмите на кнопк и разрешите использовать списочек', {
         reply_markup: new InlineKeyboard()
             .url('Shikimori', getLoginURI('shiki', ctx.from!.id).toString())
-            .url('Anilist', getRedirectURI('anilist', ctx.from!.id).toString())
+            .url('Anilist', getLoginURI('anilist', ctx.from!.id).toString())
     })
 )
 
