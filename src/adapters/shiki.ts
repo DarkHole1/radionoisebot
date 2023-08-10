@@ -98,6 +98,7 @@ export function getUnauthorizedAPI(): IUnauthorizedAPI {
 export async function getAuthorizedAPI(token: OAuthToken): Promise<{ api: IAuthorizedAPI | null, token: OAuthToken | null }> {
     const now = Date.now() / 1000
     let newToken: OAuthToken | null = null
+    let accessToken = token.access_token
 
     if (token.valid_until && token.valid_until < now) {
         console.log('Refreshing token')
@@ -136,10 +137,11 @@ export async function getAuthorizedAPI(token: OAuthToken): Promise<{ api: IAutho
             refresh_token: parsed.data.refresh_token,
             valid_until: parsed.data.created_at + parsed.data.expires_in
         }
+        accessToken = parsed.data.access_token
     }
 
     return {
-        api: new AuthorizedAPI(token.access_token),
+        api: new AuthorizedAPI(accessToken),
         token: newToken
     }
 }
