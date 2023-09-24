@@ -1,12 +1,12 @@
 import axios from "axios"
 import FormData from 'form-data'
-import { AnimesGetResponse, AnimeShort, API, MangasGetResponse, MangaShort, SHIKIMORI_URL } from "shikimori"
+import { AnimesGetResponse, AnimeShort, API, APIOptions, MangasGetResponse, MangaShort, SHIKIMORI_URL } from "shikimori"
 import { config } from "../config"
 import { RawTokenResponse } from "../models/token-response"
 import { ContentType, IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
 
-const defaultOptions = {
-    baseUrl: 'https://shikimori.one/api',
+const defaultOptions: APIOptions = {
+    baseURL: 'https://shikimori.one/api',
     userAgent: config.shiki.name,
     axios: {
         headers: { "Accept-Encoding": "*" }
@@ -17,7 +17,10 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
     private shiki: API
 
     constructor() {
+        console.log('creating uapi')
         this.shiki = new API(defaultOptions)
+        console.log(defaultOptions)
+        console.log(this.shiki.request)
     }
 
     async search({ query, type, page }: SearchParams): Promise<SearchResult[]> {
