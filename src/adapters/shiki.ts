@@ -6,6 +6,7 @@ import { RawTokenResponse } from "../models/token-response"
 import { ContentType, IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
 
 const defaultOptions = {
+    baseUrl: 'https://shikimori.one/api',
     userAgent: config.shiki.name,
     axios: {
         headers: { "Accept-Encoding": "*" }
