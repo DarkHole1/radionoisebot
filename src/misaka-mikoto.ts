@@ -30,7 +30,7 @@ misaka.on('inline_query', async ctx => {
                 text: "Войти в шики",
                 start_parameter: "login"
             } : undefined,
-            cache_time: 0
+            // cache_time: 0
         })
         return
     }
