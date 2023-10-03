@@ -102,9 +102,9 @@ function makeKeyboard(searchType: string, result: SearchResult): InlineKeyboard 
     // TODO: Make generic (manga / anilist)
     if(searchType == 'anime') {
         keyboard
-            .text('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki`)
-            .text('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal`)
-            .text('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist`)
+            .url('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki`)
+            .url('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal`)
+            .url('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist`)
             .row()
     }
     keyboard.text('Добавить в запланированное', `add-planned:${searchType[0]}:${result.id}`)

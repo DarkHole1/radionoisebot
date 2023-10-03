@@ -14,7 +14,7 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
         return res.status(404).send('¯\_(ツ)_/¯')
     }
     const from = idTypes.catch('shiki').parse(req.query.from)
-    const to = idTypes.catch('anilist').parse(req.query.from)
+    const to = idTypes.catch('anilist').parse(req.query.to)
 
     let resolvedId
     if (from == to || (['shiki', 'mal'].includes(from) && ['shiki', 'mal'].includes(to))) {
