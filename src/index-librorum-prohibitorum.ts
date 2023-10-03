@@ -6,6 +6,7 @@ import path from 'path'
 import { shirai } from "./shirai-kuroko"
 import { misaka } from "./misaka-mikoto"
 import { kakine } from './kakine-teitoku'
+import { tsuchimikado } from './tsuchimikado-motoharu'
 
 const bot = new Bot(config.token)
 
@@ -29,6 +30,7 @@ bot.catch((err) => {
 
 const app = express()
 app.use(treeDiagram)
+app.use(tsuchimikado)
 app.use(express.static(path.resolve('static')))
 
 app.listen(9086)

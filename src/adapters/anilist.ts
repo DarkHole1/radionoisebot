@@ -38,6 +38,12 @@ const resolveMalIdQuery = `query ($id: Int, $type: MediaType) {
     }
   }
   `
+const resolveIdQuery = `query ($id: Int) {
+    Media(id: $id) {
+      idMal
+    }
+  }
+  `
 const searchInListQuery = `query ($id: Int, $mediaId: Int) {
     MediaList(userId: $id, mediaId: $mediaId) {
       id
@@ -102,6 +108,21 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
     }
 }
 
+export async function resolveMalId(id: number, type?: ContentType): Promise<number | undefined> {
+    console.log('Search mal ID %s %s', id, type)
+    const anilistType = type ? (type == 'anime' ? 'ANIME' : 'MANGA') : undefined
+    const res = await makeAPICall({ query: resolveMalIdQuery, variables: { id, type: anilistType } })
+    console.log(res)
+    return res.data?.Media?.id
+}
+
+export async function resolveId(id: number): Promise<number | undefined> {
+    console.log('Search ID %s', id)
+    const res = await makeAPICall({ query: resolveIdQuery, variables: { id } })
+    console.log(res)
+    return res.data?.Media?.malId
+}
+
 class AuthorizedAPI implements IAuthorizedAPI {
     private token: string
 
@@ -109,13 +130,6 @@ class AuthorizedAPI implements IAuthorizedAPI {
         this.token = token
     }
 
-    async resolveMalId(type: ContentType, id: number): Promise<number> {
-        console.log('Search mal ID %s %s', id, type)
-        const anilistType = type == 'anime' ? 'ANIME' : 'MANGA'
-        const res = await makeAPICall({ query: resolveMalIdQuery, variables: { id, type: anilistType } })
-        console.log(res)
-        return res.data.Media.id
-    }
 
     async hasTitle({ type, id }: { type: ContentType; id: number }): Promise<boolean> {
         const me = (await makeAPICall({ query: viewerQuery }, this.token)).data.Viewer
@@ -123,7 +137,7 @@ class AuthorizedAPI implements IAuthorizedAPI {
             throw new Error('Login error')
         }
 
-        const anilistId = await this.resolveMalId(type, id)
+        const anilistId = await resolveMalId(id, type)
         const res = (await makeAPICall({
             query: searchInListQuery, variables: {
                 id: me.id,
@@ -140,7 +154,7 @@ class AuthorizedAPI implements IAuthorizedAPI {
             throw new Error('Login error')
         }
 
-        const anilistId = await this.resolveMalId(type, id)
+        const anilistId = await resolveMalId(id, type)
         await makeAPICall({
             query: addQuery,
             variables: {
