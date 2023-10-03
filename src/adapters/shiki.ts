@@ -113,7 +113,7 @@ export async function getAuthorizedAPI(token: OAuthToken): Promise<{ api: IAutho
         form.append('refresh_token', token.refresh_token)
 
         const response = await axios.post(
-            'https://shikimori.me/oauth/token',
+            'https://shikimori.one/oauth/token',
             form,
             {
                 headers: {
@@ -151,7 +151,7 @@ export async function getAuthorizedAPI(token: OAuthToken): Promise<{ api: IAutho
 }
 
 export function getOAuthURL(redirect_uri: URL): URL {
-    const result = new URL('https://shikimori.me/oauth/authorize')
+    const result = new URL('https://shikimori.one/oauth/authorize')
     result.searchParams.append('client_id', config.shiki.client_id)
     result.searchParams.append('redirect_uri', redirect_uri.toString())
     result.searchParams.append('response_type', 'code')
@@ -169,7 +169,7 @@ export async function getToken(redirect_uri: URL, code: string): Promise<OAuthTo
 
     console.log('Start fetching token')
     const response = await axios.post(
-        'https://shikimori.me/oauth/token',
+        'https://shikimori.one/oauth/token',
         form,
         {
             headers: {
