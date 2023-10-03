@@ -13,7 +13,8 @@ export const RawConfig = z.object({
         name: z.string()
     }),
     server: z.object({
-        oauth: z.string()
+        oauth: z.string(),
+        resolve: z.string()
     })
 })
 export type RawConfig = z.infer<typeof RawConfig>

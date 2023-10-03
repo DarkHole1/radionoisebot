@@ -1,6 +1,7 @@
 import { Composer, InlineKeyboard } from "grammy"
 import * as aogami from './aogami-pierce'
-import { ContentType } from "./adapters/types"
+import { ContentType, SearchResult } from "./adapters/types"
+import { config } from './config'
 
 export const misaka = new Composer()
 const searchAPI = aogami.getUnauthorizedAPI({ type: 'shiki' })
@@ -56,7 +57,7 @@ misaka.on('inline_query', async ctx => {
         input_message_content: {
             message_text: `${result.mainTitle} / ${result.secondaryTitle}\n${result.url}`
         },
-        reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:${searchType[0]}:${result.id}`),
+        reply_markup: makeKeyboard(searchType, result),
         url: result.url,
         hide_url: true
     }
@@ -95,6 +96,20 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     }
     await ctx.answerCallbackQuery('Что-то пошло не так')
 })
+
+function makeKeyboard(searchType: string, result: SearchResult): InlineKeyboard {
+    const keyboard = new InlineKeyboard()
+    // TODO: Make generic (manga / anilist)
+    if(searchType == 'anime') {
+        keyboard
+            .text('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki`)
+            .text('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal`)
+            .text('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist`)
+            .row()
+    }
+    keyboard.text('Добавить в запланированное', `add-planned:${searchType[0]}:${result.id}`)
+    return keyboard
+}
 
 function parseSaveType(match?: string): ContentType {
     if (!match || match == 'a') {
