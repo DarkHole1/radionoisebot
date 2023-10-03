@@ -11,7 +11,7 @@ const shiki2anilist = new Map<number, number>()
 tsuchimikado.get('/resolve/:id', async (req, res) => {
     const id = parseInt(req.params.id)
     if (isNaN(id)) {
-        return res.status(404).send('¯\_(ツ)_/¯')
+        return res.status(404).send('¯\\_(ツ)_/¯')
     }
     const from = idTypes.catch('shiki').parse(req.query.from)
     const to = idTypes.catch('anilist').parse(req.query.to)
@@ -22,7 +22,7 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
     } else if (['shiki', 'mal'].includes(from) && to == 'anilist') {
         resolvedId = anilist2shiki.get(id)
         if (!resolvedId) {
-            resolvedId = await anilist.resolveMalId(id)
+            resolvedId = await anilist.resolveMalId(id, 'anime')
             if (resolvedId) {
                 anilist2shiki.set(id, resolvedId)
                 shiki2anilist.set(resolvedId, id)
