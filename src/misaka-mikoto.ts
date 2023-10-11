@@ -97,7 +97,7 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     await ctx.answerCallbackQuery('Что-то пошло не так')
 })
 
-function makeKeyboard(searchType: string, result: SearchResult): InlineKeyboard {
+export function makeKeyboard(searchType: string, result: { id: string | number }): InlineKeyboard {
     const keyboard = new InlineKeyboard()
     // TODO: Make generic (manga / anilist)
     if(searchType == 'anime') {

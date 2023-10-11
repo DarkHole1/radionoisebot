@@ -2,6 +2,7 @@ import { readFileSync } from "fs"
 import { writeFile } from "fs/promises"
 import { Composer, InlineKeyboard } from "grammy"
 import { guard, isUserHasId } from "grammy-guard"
+import { makeKeyboard } from './misaka-mikoto'
 import { RawTags } from "./models/tags"
 
 export const shirai = new Composer()
@@ -18,7 +19,9 @@ shirai.on('msg::hashtag')
             const hashtag = ctx.entities('hashtag')[0].text
             const reply = ctx.msg.reply_to_message!
             if (!reply.entities) return
-            const anime = reply.entities.map(e => ({ ...e, text: reply.text!.substring(e.offset, e.offset + e.length) })).filter(e => e.type == 'url' && e.text.startsWith('https://shikimori.me/animes/'))[0].text
+            const anime = reply.entities
+                .map(e => ({ ...e, text: reply.text!.substring(e.offset, e.offset + e.length) }))
+                .filter(e => e.type == 'url' && e.text.startsWith('https://shikimori.me/animes/'))[0].text
 
             hash2anime.set(hashtag, anime)
             await saveToFile(hash2anime)
@@ -33,8 +36,13 @@ shirai.on(':is_automatic_forward', async ctx => {
     const animes = tags.flatMap(tag => hash2anime.get(tag) ?? [])
     for(const anime of animes) {
         const id = anime2id(anime)
+        if (!id) {
+            return await ctx.reply(anime, {
+                reply_to_message_id: ctx.msg.message_id
+            })
+        }
         await ctx.reply(anime, {
-            reply_markup: new InlineKeyboard().text('Добавить в запланированное', `add-planned:a:${id}`),
+            reply_markup: makeKeyboard('anime', { id }),
             reply_to_message_id: ctx.msg.message_id
         })
     }
@@ -58,6 +66,9 @@ async function saveToFile(map: Map<string, string>) {
 }
 
 function anime2id(url: string) {
-    const strippedUrl = url.slice('https://shikimori.me/animes/'.length)
-    return parseInt(strippedUrl)
+    const match = url.match(/^https:\/\/shikimori\.(?:me|one)\/animes\/.*?(\d+)/)
+    if (!match) {
+        return null
+    }
+    return parseInt(match[1])
 }
