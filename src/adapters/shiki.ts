@@ -1,9 +1,11 @@
 import axios from "axios"
 import FormData from 'form-data'
-import { AnimesGetResponse, AnimeShort, API, APIOptions, MangasGetResponse, MangaShort, SHIKIMORI_URL } from "shikimori"
+import { AnimesGetResponse, AnimeShort, API, APIOptions, MangasGetResponse, MangaShort } from "shikimori"
 import { config } from "../config"
 import { RawTokenResponse } from "../models/token-response"
 import { ContentType, IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
+
+const SHIKIMORI_URL = 'https://shikimori.one'
 
 const defaultOptions: APIOptions = {
     baseURL: 'https://shikimori.one/api',

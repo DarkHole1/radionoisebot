@@ -45,7 +45,7 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
 
     // TODO: Resolve not animes
     if (to == 'shiki') {
-        return res.redirect('https://shikimori.me/animes/' + resolvedId)
+        return res.redirect('https://shikimori.one/animes/' + resolvedId)
     }
     if (to == 'mal') {
         return res.redirect('https://myanimelist.net/anime/' + resolvedId)
