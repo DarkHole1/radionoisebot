@@ -21,7 +21,7 @@ shirai.on('msg::hashtag')
             if (!reply.entities) return
             const anime = reply.entities
                 .map(e => ({ ...e, text: reply.text!.substring(e.offset, e.offset + e.length) }))
-                .filter(e => e.type == 'url' && e.text.match(/$https:\/\/shikimori.(me|one)\/animes\//))[0].text
+                .filter(e => e.type == 'url' && e.text.match(/^https:\/\/shikimori\.(me|one)\/animes\//i))[0].text
 
             hash2anime.set(hashtag, anime)
             await saveToFile(hash2anime)
@@ -34,7 +34,7 @@ shirai.on(':is_automatic_forward', async ctx => {
     const tags = ctx.entities('hashtag').map(e => e.text)
     console.log('gotcha %s', tags)
     const animes = tags.flatMap(tag => hash2anime.get(tag) ?? [])
-    for(const anime of animes) {
+    for (const anime of animes) {
         const id = anime2id(anime)
         if (!id) {
             return await ctx.reply(anime, {
