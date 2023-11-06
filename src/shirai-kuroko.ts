@@ -21,7 +21,7 @@ shirai.on('msg::hashtag')
             if (!reply.entities) return
             const anime = reply.entities
                 .map(e => ({ ...e, text: reply.text!.substring(e.offset, e.offset + e.length) }))
-                .filter(e => e.type == 'url' && e.text.startsWith('https://shikimori.me/animes/'))[0].text
+                .filter(e => e.type == 'url' && e.text.match(/https:\/\/shikimori.(me|one)\/animes\//))[0].text
 
             hash2anime.set(hashtag, anime)
             await saveToFile(hash2anime)
