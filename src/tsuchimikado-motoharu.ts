@@ -1,12 +1,15 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import * as anilist from './adapters/anilist'
+import * as anime365 from './adapters/anime365'
 
 export const tsuchimikado = Router()
 
-const idTypes = z.enum(['shiki', 'anilist', 'mal'])
-const anilist2shiki = new Map<number, number>()
+const idTypes = z.enum(['shiki', 'anilist', 'mal', 'anime365'])
 const shiki2anilist = new Map<number, number>()
+const anilist2shiki = new Map<number, number>()
+const anime365toShiki = new Map<number, number>()
+const shikiToAnime365 = new Map<number, number>()
 
 tsuchimikado.get('/resolve/:id', async (req, res) => {
     const id = parseInt(req.params.id)
@@ -20,21 +23,30 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
     if (from == to || (['shiki', 'mal'].includes(from) && ['shiki', 'mal'].includes(to))) {
         resolvedId = id
     } else if (['shiki', 'mal'].includes(from) && to == 'anilist') {
-        resolvedId = anilist2shiki.get(id)
+        resolvedId = shiki2anilist.get(id)
         if (!resolvedId) {
             resolvedId = await anilist.resolveMalId(id, 'anime')
+            if (resolvedId) {
+                shiki2anilist.set(id, resolvedId)
+                anilist2shiki.set(resolvedId, id)
+            }
+        }
+    } else if (from == 'anilist' && ['shiki', 'mal'].includes(to)) {
+        resolvedId = anilist2shiki.get(id)
+        if (!resolvedId) {
+            resolvedId = await anilist.resolveId(id)
             if (resolvedId) {
                 anilist2shiki.set(id, resolvedId)
                 shiki2anilist.set(resolvedId, id)
             }
         }
-    } else if (from == 'anilist' && ['shiki', 'mal'].includes(to)) {
-        resolvedId = shiki2anilist.get(id)
+    } else if(['shiki', 'mal'].includes(from) && to == 'anime365') {
+        resolvedId = shikiToAnime365.get(id)
         if (!resolvedId) {
-            resolvedId = await anilist.resolveId(id)
+            resolvedId = await anime365.resolveId(id)
             if (resolvedId) {
-                shiki2anilist.set(id, resolvedId)
-                anilist2shiki.set(resolvedId, id)
+                shikiToAnime365.set(id, resolvedId)
+                anime365toShiki.set(resolvedId, id)
             }
         }
     }
@@ -52,5 +64,8 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
     }
     if (to == 'anilist') {
         return res.redirect('https://anilist.co/anime/' + resolvedId)
+    }
+    if(to == 'anime365') {
+        return res.redirect('https://anime365.ru/catalog/' + resolvedId)
     }
 })
