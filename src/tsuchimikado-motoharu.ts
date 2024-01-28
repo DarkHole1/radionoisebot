@@ -43,7 +43,7 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
     } else if(['shiki', 'mal'].includes(from) && to == 'anime365') {
         resolvedId = shikiToAnime365.get(id)
         if (!resolvedId) {
-            resolvedId = await anime365.resolveId(id)
+            resolvedId = await anime365.resolveMalId(id)
             if (resolvedId) {
                 shikiToAnime365.set(id, resolvedId)
                 anime365toShiki.set(resolvedId, id)
@@ -52,7 +52,7 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
     }
 
     if (!resolvedId) {
-        return res.status(404).send('¯\_(ツ)_/¯')
+        return res.status(404).send('¯\\_(ツ)_/¯')
     }
 
     // TODO: Resolve not animes
