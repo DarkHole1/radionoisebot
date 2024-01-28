@@ -1,10 +1,10 @@
 import axios from 'axios'
+import { config } from '../config'
 
-const name = 'Radio Noise Bot'
 const instance = axios.create({
     baseURL: 'https://smotret-anime.online/api/',
     headers: {
-        'User-Agent': name,
+        'User-Agent': config.anime365.name,
         'Accept-Encoding': '*'
     }
 })

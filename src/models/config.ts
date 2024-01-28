@@ -12,6 +12,9 @@ export const RawConfig = z.object({
         client_secret: z.string(),
         name: z.string()
     }),
+    anime365: z.object({
+        name: z.string()
+    }),
     server: z.object({
         oauth: z.string(),
         resolve: z.string()
