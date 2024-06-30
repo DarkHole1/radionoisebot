@@ -14,10 +14,10 @@
   resolved "https://registry.yarnpkg.com/@grammyjs/parse-mode/-/parse-mode-1.7.1.tgz#7a7f15a0d289ea9d518662e8c625a646dd71cc2d"
   integrity sha512-eLM4HByDnDIwwpjcKlhyVvWEGMwSryS6Fk5GviX1gu2CrKNInJ2CeIkvydY32OcRl7Jo6votFDquZENeEP6kKw==
 
-"@grammyjs/types@3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@grammyjs/types/-/types-3.1.1.tgz#dd80c018ffaf44bd89c56160edb3d9e86b84251f"
-  integrity sha512-nTNYvk+Al/nXZAMTEzPYEyW6pfgYgNuf/gxfx17kCxjHpAYhV+pcmROuD9eOBDLaBDh/hZJkQTIY6S3CfTAC0Q==
+"@grammyjs/types@3.9.0":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@grammyjs/types/-/types-3.9.0.tgz#dff605d2b0cd257318ec8968df3f8f81f7c66dc7"
+  integrity sha512-QzZAbz5COBZnDlDs6x94TIIIH5Pi7AMk0rJPM2O5JAz5Q+s7Xxp3lGg/pWyiVR9Q8euRDYCJmDtcRjwwFD6a3g==
 
 "@jridgewell/resolve-uri@^3.0.3":
   version "3.1.1"
@@ -447,15 +447,15 @@ grammy-guard@^0.5.0:
   dependencies:
     callback-data "^1.0.0"
 
-grammy@^1.16.0:
-  version "1.16.0"
-  resolved "https://registry.yarnpkg.com/grammy/-/grammy-1.16.0.tgz#8ab5a9abf44bafe13610fbb54ed402044cff3293"
-  integrity sha512-qy9ZWBpV3CsbXjcxX2c2gJtpRIpaIeGweb51Od1cg0G8CapZTS3Y8gTUzd0OgDSy+2kUvuliTHPjs+843Ltc2g==
+grammy@^1.25.0:
+  version "1.25.2"
+  resolved "https://registry.yarnpkg.com/grammy/-/grammy-1.25.2.tgz#6efd5d9df9128bcf66757ea0b050a65542114b5c"
+  integrity sha512-i1NCr2B8d5/hEHbIzqwG/1+JmIY63xVcBPCyciJB88BYKlXKsM42v5dfRVGf7AYyPxL07Em0qk42Z6YJIqR3HQ==
   dependencies:
-    "@grammyjs/types" "3.1.1"
+    "@grammyjs/types" "3.9.0"
     abort-controller "^3.0.0"
     debug "^4.3.4"
-    node-fetch "^2.6.9"
+    node-fetch "^2.7.0"
 
 has-proto@^1.0.1:
   version "1.0.1"
@@ -564,10 +564,10 @@ negotiator@0.6.3:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.3.tgz#58e323a72fedc0d6f9cd4d31fe49f51479590ccd"
   integrity sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==
 
-node-fetch@^2.6.9:
-  version "2.6.11"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.11.tgz#cde7fc71deef3131ef80a738919f999e6edfff25"
-  integrity sha512-4I6pdBY1EthSqDmJkiNk3JIT8cswwR9nfeW/cPdUagJYEQG7R95WRH74wpz7ma8Gh/9dI9FP+OU+0E4FvtA55w==
+node-fetch@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
+  integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
   dependencies:
     whatwg-url "^5.0.0"
 

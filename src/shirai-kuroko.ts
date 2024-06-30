@@ -43,7 +43,10 @@ shirai.on(':is_automatic_forward', async ctx => {
         }
         await ctx.reply(anime, {
             reply_markup: makeKeyboard('anime', { id }),
-            reply_to_message_id: ctx.msg.message_id
+            reply_to_message_id: ctx.msg.message_id,
+            link_preview_options: {
+                url: `http://cdn.anime-recommend.ru/previews/${id}.jpg`
+            }
         })
     }
 })
