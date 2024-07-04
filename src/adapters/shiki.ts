@@ -51,7 +51,8 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
                 image: getAbsoluteImage(res),
                 mainTitle: res.name,
                 secondaryTitle: res.russian,
-                url: new URL(res.url, SHIKIMORI_URL).toString()
+                url: new URL(res.url, SHIKIMORI_URL).toString(),
+                previewUrl: `http://cdn.anime-recommend.ru/previews/${res.id}.jpg`
             }
         })
         return adaptedResults

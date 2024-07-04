@@ -55,7 +55,10 @@ misaka.on('inline_query', async ctx => {
         title: result.mainTitle,
         description: result.secondaryTitle,
         input_message_content: {
-            message_text: `${result.mainTitle} / ${result.secondaryTitle}\n${result.url}`
+            message_text: `${result.mainTitle} / ${result.secondaryTitle}\n${result.url}`,
+            link_preview_options: {
+                url: result.previewUrl ?? result.url
+            }
         },
         reply_markup: makeKeyboard(searchType, result),
         url: result.url,

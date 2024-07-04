@@ -14,7 +14,8 @@ export type SearchResult = {
     },
     mainTitle: string,
     secondaryTitle: string,
-    url: string
+    url: string,
+    previewUrl?: string
 }
 
 export interface IUnauthorizedAPI {
