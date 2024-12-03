@@ -45,7 +45,7 @@ shirai.on(':is_automatic_forward', async ctx => {
             reply_markup: makeKeyboard(res.type, { id: res.id }),
             reply_to_message_id: ctx.msg.message_id,
             link_preview_options: {
-                url: `http://cdn.anime-recommend.ru/previews/${res.id}.jpg`
+                url: `http://cdn.anime-recommend.ru/previews/${res.type == 'anime' ? '' : 'manga/'}${res.id}.jpg`
             }
         })
     }
