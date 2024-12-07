@@ -108,7 +108,6 @@ export function makeKeyboard(searchType: string, result: { id: string | number }
             .url('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki`)
             .url('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal`)
             .url('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist`)
-            .url('Anime365', `${config.server.resolve}/${result.id}?from=shiki&to=anime365`)
             .row()
     }
     keyboard.text('Добавить в запланированное', `add-planned:${searchType[0]}:${result.id}`)
