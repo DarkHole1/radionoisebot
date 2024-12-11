@@ -52,7 +52,8 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
                 mainTitle: res.name,
                 secondaryTitle: res.russian,
                 url: new URL(res.url, SHIKIMORI_URL).toString(),
-                previewUrl: `http://cdn.anime-recommend.ru/previews/${type == 'anime' ? '' : 'manga/'}${res.id}.jpg`
+                previewUrl: `http://cdn.anime-recommend.ru/previews/${type == 'anime' ? '' : 'manga/'}${res.id}.jpg`,
+                externalLinks: new Map()
             }
         })
         return adaptedResults

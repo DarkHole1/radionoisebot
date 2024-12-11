@@ -16,6 +16,7 @@ export type SearchResult = {
     secondaryTitle: string,
     url: string,
     previewUrl?: string
+    externalLinks?: Map<string, string>
 }
 
 export interface IUnauthorizedAPI {
