@@ -100,15 +100,27 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     await ctx.answerCallbackQuery('Что-то пошло не так')
 })
 
-export function makeKeyboard(searchType: string, result: { id: string | number }): InlineKeyboard {
+export function makeKeyboard(searchType: string, result: { id: string | number, externalLinks?: Map<string, string> }): InlineKeyboard {
     const keyboard = new InlineKeyboard()
     // TODO: Make generic (manga / anilist)
-    if(searchType == 'anime') {
+    if (searchType == 'anime') {
         keyboard
             .url('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki`)
             .url('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal`)
             .url('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist`)
             .row()
+    }
+    if (result.externalLinks) {
+        const knownLinks = {
+            'kinopoisk': 'Кинопоиск'
+        }
+        for(const [key, name] of Object.entries(knownLinks)) {
+            const value = result.externalLinks.get(key)
+            if (value) {
+                keyboard.url(name, value)
+            }
+        }
+        keyboard.row()
     }
     keyboard.text('Добавить в запланированное', `add-planned:${searchType[0]}:${result.id}`)
     return keyboard
