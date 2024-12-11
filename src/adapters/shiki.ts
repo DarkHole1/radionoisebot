@@ -6,6 +6,7 @@ import { RawTokenResponse } from "../models/token-response"
 import { ContentType, IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
 
 const SHIKIMORI_URL = 'https://shikimori.one'
+const SHIKIMORI_GRAPHQL_URL = `${SHIKIMORI_URL}/api/graphql`
 
 const defaultOptions: APIOptions = {
     baseURL: 'https://shikimori.one/api',
@@ -13,6 +14,75 @@ const defaultOptions: APIOptions = {
     axios: {
         headers: { "Accept-Encoding": "*" }
     }
+}
+
+const searchAnimeQuery = `query($search: String, $page: PositiveInt, $limit: PositiveInt) {
+  animes(search: $search, page: $page, limit: $limit) {
+    id
+    name
+    russian
+    url
+    externalLinks {
+      kind
+      url
+    }
+    poster {
+      originalUrl
+      previewAltUrl
+    }
+  }
+}`
+
+async function makeAPICall(params: { query: string, variables?: unknown }) {
+    const res = await axios.post(SHIKIMORI_GRAPHQL_URL, JSON.stringify(params), {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        validateStatus: _status => true
+    })
+    return res.data
+}
+
+type ShikimoriSearchParams = {
+    search: string,
+    page: number,
+    limit: number
+}
+type SimpeAnime = {
+    id: number,
+    name: string,
+    russian: string,
+    url: string,
+    image: {
+        original?: string
+        preview?: string
+    },
+    externalLinks?: Map<string, string>
+}
+type SimpleAnimesResponse = SimpeAnime[]
+
+async function searchAnime(params: ShikimoriSearchParams): Promise<SimpleAnimesResponse> {
+    const res = await makeAPICall({
+        query: searchAnimeQuery,
+        variables: params
+    })
+
+    if ('errors' in res) {
+        console.error('An error occured %o', res.errors)
+    }
+
+    return (res.data?.animes ?? []).map((anime: any) => ({
+        id: anime.id,
+        name: anime.name,
+        russian: anime.russian,
+        url: anime.url,
+        image: {
+            original: anime.poster.originalUrl,
+            preview: anime.poster.previewAltUrl
+        },
+        externalLinks: new Map(anime.externalLinks.map((link: any) => [link.kind, link.url]))
+    }))
 }
 
 class UnauthorizedAPI implements IUnauthorizedAPI {
@@ -26,7 +96,7 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
     }
 
     async search({ query, type, page }: SearchParams): Promise<SearchResult[]> {
-        let results: (AnimesGetResponse | MangasGetResponse)
+        let results: (AnimesGetResponse | MangasGetResponse | SimpleAnimesResponse)
         const args = {
             search: query,
             limit: 10,
@@ -35,7 +105,8 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
 
         switch (type) {
             case 'anime':
-                results = await this.shiki.animes.get(args)
+                // results = await this.shiki.animes.get(args)
+                results = await searchAnime(args)
                 break
             case 'manga':
                 results = await this.shiki.mangas.get(args)
@@ -53,7 +124,8 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
                 secondaryTitle: res.russian,
                 url: new URL(res.url, SHIKIMORI_URL).toString(),
                 previewUrl: `http://cdn.anime-recommend.ru/previews/${type == 'anime' ? '' : 'manga/'}${res.id}.jpg`,
-                externalLinks: new Map()
+                // TODO: Fix any
+                externalLinks: (res as any).externalLinks
             }
         })
         return adaptedResults
@@ -202,7 +274,7 @@ export async function getToken(redirect_uri: URL, code: string): Promise<OAuthTo
     }
 }
 
-function getAbsoluteImage(anime: AnimeShort | MangaShort) {
+function getAbsoluteImage(anime: AnimeShort | MangaShort | SimpeAnime) {
     const original = new URL(anime.image.original ?? '/assets/globals/missing_original.jpg', SHIKIMORI_URL).toString()
     const preview = new URL(anime.image.preview ?? '/assets/globals/missing_preview.jpg', SHIKIMORI_URL).toString()
     return { original, preview }
