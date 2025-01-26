@@ -41,6 +41,10 @@ const resolveMalIdQuery = `query ($id: Int, $type: MediaType) {
 const resolveIdQuery = `query ($id: Int) {
     Media(id: $id) {
       idMal
+      externalLinks {
+        siteId,
+        url
+      }
     }
   }
   `
@@ -121,6 +125,17 @@ export async function resolveId(id: number): Promise<number | undefined> {
     const res = await makeAPICall({ query: resolveIdQuery, variables: { id } })
     console.log(res)
     return res.data?.Media?.malId
+}
+
+export async function resolveToCrunchyroll(id: number): Promise<string | undefined> {
+    console.log('Search crunchyroll id for %s', id)
+    const res = await makeAPICall({ query: resolveIdQuery, variables: { id } })
+    console.log(res)
+    const links = res.data?.Media?.externalLinks
+    if (!links) {
+        return
+    }
+    return links.find((link: any) => link?.siteId == 5)?.url
 }
 
 class AuthorizedAPI implements IAuthorizedAPI {

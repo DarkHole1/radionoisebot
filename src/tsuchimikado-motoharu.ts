@@ -5,19 +5,21 @@ import * as anime365 from './adapters/anime365'
 
 export const tsuchimikado = Router()
 
-const idTypes = z.enum(['shiki', 'anilist', 'mal', 'anime365'])
+const fromIdTypes = z.enum(['shiki', 'anilist', 'mal'])
+const toIdTypes = z.enum(['shiki', 'anilist', 'mal', 'anime365', 'crunchyroll'])
 const shiki2anilist = new Map<number, number>()
 const anilist2shiki = new Map<number, number>()
 const anime365toShiki = new Map<number, number>()
 const shikiToAnime365 = new Map<number, number>()
+const shiki2crunchyroll = new Map<number, string>()
 
 tsuchimikado.get('/resolve/:id', async (req, res) => {
     const id = parseInt(req.params.id)
     if (isNaN(id)) {
         return res.status(404).send('¯\\_(ツ)_/¯')
     }
-    const from = idTypes.catch('shiki').parse(req.query.from)
-    const to = idTypes.catch('anilist').parse(req.query.to)
+    const from = fromIdTypes.catch('shiki').parse(req.query.from)
+    const to = toIdTypes.catch('anilist').parse(req.query.to)
 
     let resolvedId
     if (from == to || (['shiki', 'mal'].includes(from) && ['shiki', 'mal'].includes(to))) {
@@ -40,13 +42,26 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
                 shiki2anilist.set(resolvedId, id)
             }
         }
-    } else if(['shiki', 'mal'].includes(from) && to == 'anime365') {
+    } else if (['shiki', 'mal'].includes(from) && to == 'anime365') {
         resolvedId = shikiToAnime365.get(id)
         if (!resolvedId) {
             resolvedId = await anime365.resolveMalId(id)
             if (resolvedId) {
                 shikiToAnime365.set(id, resolvedId)
                 anime365toShiki.set(resolvedId, id)
+            }
+        }
+    } else if (['shiki', 'mal'].includes(from) && to == 'crunchyroll') {
+        let crunchyrollUrl = shiki2crunchyroll.get(id)
+        if (crunchyrollUrl) {
+            return res.redirect(crunchyrollUrl)
+        }
+        const anilistId = await anilist.resolveMalId(id)
+        if (anilistId) {
+            crunchyrollUrl = await anilist.resolveToCrunchyroll(anilistId)
+            if (crunchyrollUrl) {
+                shiki2crunchyroll.set(id, crunchyrollUrl)
+                return res.redirect(crunchyrollUrl)
             }
         }
     }
@@ -65,7 +80,7 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
     if (to == 'anilist') {
         return res.redirect('https://anilist.co/anime/' + resolvedId)
     }
-    if(to == 'anime365') {
+    if (to == 'anime365') {
         return res.redirect('https://anime365.ru/catalog/' + resolvedId)
     }
 })
