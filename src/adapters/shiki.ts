@@ -74,17 +74,23 @@ async function searchAnime(params: ShikimoriSearchParams): Promise<SimpleAnimesR
         console.error('An error occured %o', res.errors)
     }
 
-    return (res.data?.animes ?? []).map((anime: any) => ({
-        id: anime.id,
-        name: anime.name,
-        russian: anime.russian,
-        url: anime.url,
-        image: {
-            original: anime.poster.originalUrl,
-            preview: anime.poster.previewAltUrl
-        },
-        externalLinks: new Map(anime.externalLinks.map((link: any) => [link.kind, link.url]))
-    }))
+    return (res.data?.animes ?? []).map((anime: any) => {
+        const externalLinks = new Map(anime.externalLinks.map((link: any) => [link.kind, link.url]))
+        if(anime.fandubbers?.includes('Crunchyroll') || anime.fansubbers?.includes('Crunchyroll')) {
+            externalLinks.set('crunchyroll', `${config.server.resolve}/${anime.id}?from=shiki&to=crunchyroll`)
+        }
+        return {
+            id: anime.id,
+            name: anime.name,
+            russian: anime.russian,
+            url: anime.url,
+            image: {
+                original: anime.poster.originalUrl,
+                preview: anime.poster.previewAltUrl
+            },
+            externalLinks: externalLinks
+        }
+    })
 }
 
 class UnauthorizedAPI implements IUnauthorizedAPI {

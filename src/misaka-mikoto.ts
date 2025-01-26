@@ -112,7 +112,8 @@ export function makeKeyboard(searchType: string, result: { id: string | number, 
     }
     if (result.externalLinks) {
         const knownLinks = {
-            'kinopoisk': 'Кинопоиск'
+            'kinopoisk': 'Кинопоиск',
+            'crunchyroll': 'Crunchyroll'
         }
         for(const [key, name] of Object.entries(knownLinks)) {
             const value = result.externalLinks.get(key)
