@@ -30,6 +30,8 @@ const searchAnimeQuery = `query($search: String, $page: PositiveInt, $limit: Pos
       originalUrl
       previewAltUrl
     }
+    fansubbers
+    fandubbers
   }
 }`
 
