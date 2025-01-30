@@ -76,7 +76,7 @@ async function searchAnime(params: ShikimoriSearchParams): Promise<SimpleAnimesR
 
     return (res.data?.animes ?? []).map((anime: any) => {
         const externalLinks = new Map(anime.externalLinks.map((link: any) => [link.kind, link.url]))
-        if(anime.fandubbers?.includes('Crunchyroll') || anime.fansubbers?.includes('Crunchyroll')) {
+        if (anime.fandubbers?.includes('Crunchyroll') || anime.fansubbers?.includes('Crunchyroll')) {
             externalLinks.set('crunchyroll', `${config.server.resolve}/${anime.id}?from=shiki&to=crunchyroll`)
         }
         return {
@@ -124,6 +124,8 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
                 break
         }
 
+        // Prevents extensive caching
+        const daysFromStart = Math.floor(Date.now() / 1000 / 60 / 60 / 24)
         const adaptedResults = results.map((res): SearchResult => {
             return {
                 id: res.id.toString(),
@@ -131,7 +133,7 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
                 mainTitle: res.name,
                 secondaryTitle: res.russian,
                 url: new URL(res.url, SHIKIMORI_URL).toString(),
-                previewUrl: `http://cdn.anime-recommend.ru/previews/${type == 'anime' ? '' : 'manga/'}${res.id}.jpg`,
+                previewUrl: `http://cdn.anime-recommend.ru/previews/${type == 'anime' ? '' : 'manga/'}${res.id}.jpg?${daysFromStart}`,
                 // TODO: Fix any
                 externalLinks: (res as any).externalLinks
             }
