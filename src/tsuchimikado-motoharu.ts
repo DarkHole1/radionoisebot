@@ -56,7 +56,7 @@ tsuchimikado.get('/resolve/:id', async (req, res) => {
         if (crunchyrollUrl) {
             return res.redirect(crunchyrollUrl)
         }
-        const anilistId = await anilist.resolveMalId(id)
+        const anilistId = await anilist.resolveMalId(id, 'anime')
         if (anilistId) {
             crunchyrollUrl = await anilist.resolveToCrunchyroll(anilistId)
             if (crunchyrollUrl) {
