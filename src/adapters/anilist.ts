@@ -38,8 +38,8 @@ const resolveMalIdQuery = `query ($id: Int, $type: MediaType) {
     }
   }
   `
-const resolveIdQuery = `query ($id: Int) {
-    Media(id: $id) {
+const resolveIdQuery = `query ($id: Int, $type: MediaType) {
+    Media(id: $id, type: $type) {
       idMal
       externalLinks {
         siteId,
@@ -120,16 +120,17 @@ export async function resolveMalId(id: number, type?: ContentType): Promise<numb
     return res.data?.Media?.id
 }
 
-export async function resolveId(id: number): Promise<number | undefined> {
+export async function resolveId(id: number, type?: ContentType): Promise<number | undefined> {
     console.log('Search ID %s', id)
-    const res = await makeAPICall({ query: resolveIdQuery, variables: { id } })
+    const anilistType = type ? (type == 'anime' ? 'ANIME' : 'MANGA') : undefined
+    const res = await makeAPICall({ query: resolveIdQuery, variables: { id, type: anilistType } })
     console.log(res)
-    return res.data?.Media?.malId
+    return res.data?.Media?.idMal
 }
 
 export async function resolveToCrunchyroll(id: number): Promise<string | undefined> {
     console.log('Search crunchyroll id for %s', id)
-    const res = await makeAPICall({ query: resolveIdQuery, variables: { id } })
+    const res = await makeAPICall({ query: resolveIdQuery, variables: { id, type: 'ANIME' } })
     console.log(res)
     const links = res.data?.Media?.externalLinks
     if (!links) {
