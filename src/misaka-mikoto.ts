@@ -109,6 +109,12 @@ export function makeKeyboard(searchType: string, result: { id: string | number, 
             .url('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal`)
             .url('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist`)
             .row()
+    } else if (searchType == 'manga') {
+        keyboard
+            .url('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki&manga`)
+            .url('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal&manga`)
+            .url('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist&manga`)
+            .row()
     }
     if (result.externalLinks) {
         const knownLinks = {
