@@ -9,11 +9,6 @@ const FromIdTypes = z.enum(['shiki', 'anilist', 'mal'])
 type FromIdTypes = z.infer<typeof FromIdTypes>
 const ToIdTypes = z.enum(['shiki', 'anilist', 'mal', 'anime365', 'crunchyroll'])
 type ToIdTypes = z.infer<typeof ToIdTypes>
-const shiki2anilist = new Map<number, number>()
-const anilist2shiki = new Map<number, number>()
-const anime365toShiki = new Map<number, number>()
-const shikiToAnime365 = new Map<number, number>()
-const shiki2crunchyroll = new Map<number, string>()
 
 const cache = {
     manga: {
