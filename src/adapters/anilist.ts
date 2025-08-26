@@ -83,6 +83,8 @@ async function makeAPICall(params: { query: string, variables?: unknown }, token
 }
 
 class UnauthorizedAPI implements IUnauthorizedAPI {
+    type = 'anilist'
+
     async search(params: SearchParams): Promise<SearchResult[]> {
         const type = params.type == 'anime' ? 'ANIME' : 'MANGA'
         const format = params.type == 'anime' ? {} : (params.type == 'manga' ? { format_not: 'NOVEL' } : { format: 'NOVEL' })
@@ -99,7 +101,7 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
         }
         const results = res.data.Page.media
         const adaptedResults = results.filter((r: any) => r.idMal != null).map((result: any) => ({
-            id: result.idMal,
+            id: result.id,
             image: {
                 preview: result.coverImage.medium,
                 original: result.coverImage.large

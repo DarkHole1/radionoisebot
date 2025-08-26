@@ -60,7 +60,7 @@ misaka.on('inline_query', async ctx => {
                 url: result.previewUrl ?? result.url
             }
         },
-        reply_markup: makeKeyboard(searchType, result),
+        reply_markup: makeKeyboard(searchType, searchAPI.type, result),
         url: result.url,
         hide_url: true
     }
@@ -100,26 +100,25 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     await ctx.answerCallbackQuery('Что-то пошло не так')
 })
 
-export function makeKeyboard(searchType: string, result: { id: string | number, externalLinks?: Map<string, string> }): InlineKeyboard {
+export function makeKeyboard(searchType: string, searchEngine: string, result: { id: string | number, externalLinks?: Map<string, string> }): InlineKeyboard {
     const keyboard = new InlineKeyboard()
-    // TODO: Make generic (manga / anilist)
     if (searchType == 'anime') {
         keyboard
-            .url('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki`)
-            .url('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal`)
-            .url('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist`)
+            .url('Shiki', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=shiki`)
+            .url('MAL', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=mal`)
+            .url('Anilist', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=anilist`)
             .row()
     } else if (searchType == 'manga') {
         keyboard
-            .url('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki&manga`)
-            .url('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal&manga`)
-            .url('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist&manga`)
+            .url('Shiki', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=shiki&manga`)
+            .url('MAL', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=mal&manga`)
+            .url('Anilist', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=anilist&manga`)
             .row()
     } else if (searchType == 'ranobe') {
         keyboard
-            .url('Shiki', `${config.server.resolve}/${result.id}?from=shiki&to=shiki&manga`)
-            .url('MAL', `${config.server.resolve}/${result.id}?from=shiki&to=mal&manga`)
-            .url('Anilist', `${config.server.resolve}/${result.id}?from=shiki&to=anilist&manga`)
+            .url('Shiki', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=shiki&manga`)
+            .url('MAL', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=mal&manga`)
+            .url('Anilist', `${config.server.resolve}/${result.id}?from=${searchEngine}&to=anilist&manga`)
             .row()
     }
     if (result.externalLinks) {

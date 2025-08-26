@@ -20,6 +20,7 @@ export type SearchResult = {
 }
 
 export interface IUnauthorizedAPI {
+    type: string
     search(params: SearchParams): Promise<SearchResult[]>
 }
 export type GetUnauthorizedAPI = () => IUnauthorizedAPI

@@ -96,6 +96,8 @@ async function searchAnime(params: ShikimoriSearchParams): Promise<SimpleAnimesR
 class UnauthorizedAPI implements IUnauthorizedAPI {
     private shiki: API
 
+    type = 'shiki'
+
     constructor() {
         console.log('creating uapi')
         this.shiki = new API(defaultOptions)
