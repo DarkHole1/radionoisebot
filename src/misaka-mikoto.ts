@@ -1,10 +1,14 @@
 import { Composer, InlineKeyboard } from "grammy"
 import * as aogami from './aogami-pierce'
-import { ContentType, SearchResult } from "./adapters/types"
+import { ContentType } from "./adapters/types"
 import { config } from './config'
+import { getUserData } from "./last-order"
 
 export const misaka = new Composer()
-const searchAPI = aogami.getUnauthorizedAPI({ type: 'shiki' })
+const searchAPI = {
+    shiki: aogami.getUnauthorizedAPI({ type: 'shiki' }),
+    anilist: aogami.getUnauthorizedAPI({ type: 'anilist' })
+}
 
 misaka.on('inline_query', async ctx => {
     let query = ctx.inlineQuery.query
@@ -36,9 +40,10 @@ misaka.on('inline_query', async ctx => {
         return
     }
 
+    const searchEngine = getUserData({ userId: ctx.from.id }).search_engine
 
     const page = Number(offset) || 1
-    const results = await searchAPI.search({
+    const results = await searchAPI[searchEngine].search({
         type: searchType,
         query,
         page
@@ -60,7 +65,7 @@ misaka.on('inline_query', async ctx => {
                 url: result.previewUrl ?? result.url
             }
         },
-        reply_markup: makeKeyboard(searchType, searchAPI.type, result),
+        reply_markup: makeKeyboard(searchType, searchAPI[searchEngine].type, result),
         url: result.url,
         hide_url: true
     }
