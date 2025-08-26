@@ -2,7 +2,9 @@ import { Composer, InlineKeyboard } from "grammy"
 import * as aogami from './aogami-pierce'
 import { ContentType } from "./adapters/types"
 import { config } from './config'
-import { getUserData } from "./last-order"
+import { getUserData, setUserData } from "./last-order"
+import { guard, isPrivateChat, reply } from "grammy-guard"
+import { z } from "zod"
 
 export const misaka = new Composer()
 const searchAPI = {
@@ -48,7 +50,6 @@ misaka.on('inline_query', async ctx => {
         query,
         page
     })
-    // const results = await getSearchResults(searchType, query, page)
 
     const nextOffset = results.length > 0 ? (page + 1).toString() : ''
     await ctx.answerInlineQuery(results.map(result => ({
@@ -105,6 +106,38 @@ misaka.callbackQuery(/add-planned:(?:(a|m|r):)?(\d+)/, async ctx => {
     await ctx.answerCallbackQuery('Что-то пошло не так')
 })
 
+// TODO: Split settings to another module (perhaps?)
+misaka.command(
+    'search_engine',
+    guard(isPrivateChat, reply('Эта команда работает только в личных сообщениях', { replyToMessage: true })),
+    async (ctx) => {
+        if (['shiki', 'anilist'].includes(ctx.match)) {
+            await setUserData({
+                userId: ctx.from!.id, data: {
+                    search_engine: ctx.match as any
+                }
+            })
+            return await ctx.reply(`Успешно сменили поисковой движок!`)
+        }
+        await ctx.reply(`Выберите поисковой движок из списка:`, {
+            reply_markup: new InlineKeyboard()
+                .text('Shikimori', 'set-search-engine:shiki')
+                .text('Anilist', 'set-search-engine:anilist')
+        })
+    }
+)
+
+misaka.callbackQuery(/set-search-engine:(shiki|anilist)/, async (ctx) => {
+    try {
+        await setUserData({ userId: ctx.from.id, data: { search_engine: ctx.match[1] as any } })
+        await ctx.answerCallbackQuery('Успешно сменили поисковой движок!')
+        return
+    } catch (e) {
+        console.error(e);
+    }
+    await ctx.answerCallbackQuery('Что-то пошло не так')
+})
+
 export function makeKeyboard(searchType: string, searchEngine: string, result: { id: string | number, externalLinks?: Map<string, string> }): InlineKeyboard {
     const keyboard = new InlineKeyboard()
     if (searchType == 'anime') {
@@ -131,7 +164,7 @@ export function makeKeyboard(searchType: string, searchEngine: string, result: {
             'kinopoisk': 'Кинопоиск',
             'crunchyroll': 'Crunchyroll'
         }
-        for(const [key, name] of Object.entries(knownLinks)) {
+        for (const [key, name] of Object.entries(knownLinks)) {
             const value = result.externalLinks.get(key)
             if (value) {
                 keyboard.url(name, value)
