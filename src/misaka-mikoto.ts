@@ -15,7 +15,7 @@ const searchAPI = {
 misaka.on('inline_query', async ctx => {
     let query = ctx.inlineQuery.query
     const offset = ctx.inlineQuery.offset
-    console.log('get query "%s" with offset "%s"', query, offset)
+    console.log('get query "%s" with offset "%s" from user @%s', query, offset, ctx.inlineQuery.from.username)
 
     const userData = getUserData({ userId: ctx.from.id })
     const searchEngine = userData.search_engine
