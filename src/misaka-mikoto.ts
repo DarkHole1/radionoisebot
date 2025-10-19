@@ -17,7 +17,11 @@ misaka.on('inline_query', async ctx => {
     const offset = ctx.inlineQuery.offset
     console.log('get query "%s" with offset "%s"', query, offset)
 
-    let searchType: ContentType = 'anime'
+    const userData = getUserData({ userId: ctx.from.id })
+    const searchEngine = userData.search_engine
+    const defaultSearchType = userData.default_type
+
+    let searchType: ContentType = defaultSearchType
     if (query.startsWith('m/') || query.startsWith('м/')) {
         searchType = 'manga'
         query = query.slice(2)
@@ -41,8 +45,6 @@ misaka.on('inline_query', async ctx => {
         })
         return
     }
-
-    const searchEngine = getUserData({ userId: ctx.from.id }).search_engine
 
     const page = Number(offset) || 1
     const results = await searchAPI[searchEngine].search({
@@ -112,8 +114,11 @@ misaka.command(
     guard(isPrivateChat, reply('Эта команда работает только в личных сообщениях', { replyToMessage: true })),
     async (ctx) => {
         if (['shiki', 'anilist'].includes(ctx.match)) {
+            const userId = ctx.from!.id
+            const userData = getUserData({ userId })
             await setUserData({
-                userId: ctx.from!.id, data: {
+                userId, data: {
+                    ...userData,
                     search_engine: ctx.match as any
                 }
             })
@@ -129,8 +134,47 @@ misaka.command(
 
 misaka.callbackQuery(/set-search-engine:(shiki|anilist)/, async (ctx) => {
     try {
-        await setUserData({ userId: ctx.from.id, data: { search_engine: ctx.match[1] as any } })
+        const userId = ctx.from.id
+        const userData = getUserData({ userId })
+        await setUserData({ userId, data: { ...userData, search_engine: ctx.match[1] as any } })
         await ctx.answerCallbackQuery('Успешно сменили поисковой движок!')
+        return
+    } catch (e) {
+        console.error(e);
+    }
+    await ctx.answerCallbackQuery('Что-то пошло не так')
+})
+
+misaka.command(
+    'default_search',
+    guard(isPrivateChat, reply('Эта команда работает только в личных сообщениях', { replyToMessage: true })),
+    async (ctx) => {
+        if (['anime', 'manga', 'ranobe'].includes(ctx.match)) {
+            const userId = ctx.from!.id
+            const userData = getUserData({ userId })
+            await setUserData({
+                userId, data: {
+                    ...userData,
+                    default_type: ctx.match as any
+                }
+            })
+            return await ctx.reply(`Успешно сменили тип поиска по-умолчанию!`)
+        }
+        await ctx.reply(`Выберите, что искать по-умолчанию:`, {
+            reply_markup: new InlineKeyboard()
+                .text('Аниме', 'set-default-type:anime')
+                .text('Мангу', 'set-default-type:manga')
+                .text('Ранобэ', 'set-default-type:ranobe')
+        })
+    }
+)
+
+misaka.callbackQuery(/set-default-type:(anime|manga|ranobe)/, async (ctx) => {
+    try {
+        const userId = ctx.from.id
+        const userData = getUserData({ userId })
+        await setUserData({ userId, data: { ...userData, default_type: ctx.match[1] as any } })
+        await ctx.answerCallbackQuery('Успешно сменили тип поиска по-умолчанию!')
         return
     } catch (e) {
         console.error(e);

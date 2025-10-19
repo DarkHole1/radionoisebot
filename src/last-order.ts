@@ -6,7 +6,8 @@ let userData = RawUserData.parse(JSON.parse(readFileSync('data/user-data.json', 
 
 export function getUserData({ userId }: { userId: number }): RawUserData[0] {
     return Object.assign({
-        search_engine: 'shiki'
+        search_engine: 'shiki',
+        default_type: 'anime'
     }, userData[userId])
 }
 
