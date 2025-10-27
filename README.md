@@ -69,6 +69,19 @@ yarn install
 yarn run start
 ```
 
+### Project Structure (for contributors)
+
+The codebase uses thematic filenames inspired by the *Toaru* franchise:
+
+- `index-librorum-prohibitorum.ts` — main entrypoint  
+- `aleister-crowley.ts` — OAuth and login logic  
+- `aogami-pierce.ts` — abstract API interface for Shikimori / AniList  
+- `kakine-teitoku.ts` — `/start` command handler (currently Russian-only)  
+- `last-order.ts` — user preferences (save/load)  
+- `misaka-mikoto.ts` — core search logic and inline query handler  
+- `shirai-kuroko.ts` — personal channel helper utilities  
+- `tsuchimikado-motoharu.ts` — ID translation and proxy/redirect handler between APIs  
+
 ---
 
 ## Roadmap
