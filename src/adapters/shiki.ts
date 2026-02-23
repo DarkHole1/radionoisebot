@@ -9,7 +9,7 @@ const SHIKIMORI_URL = 'https://shikimori.one'
 const SHIKIMORI_GRAPHQL_URL = `${SHIKIMORI_URL}/api/graphql`
 
 const defaultOptions: APIOptions = {
-    baseURL: 'https://shikimori.one/api',
+    baseURL: `${SHIKIMORI_URL}/api`,
     userAgent: config.shiki.name,
     axios: {
         headers: { "Accept-Encoding": "*" }
@@ -85,8 +85,8 @@ async function searchAnime(params: ShikimoriSearchParams): Promise<SimpleAnimesR
             russian: anime.russian,
             url: anime.url,
             image: {
-                original: anime.poster.originalUrl,
-                preview: anime.poster.previewAltUrl
+                original: anime.poster?.originalUrl,
+                preview: anime.poster?.previewAltUrl
             },
             externalLinks: externalLinks
         }
