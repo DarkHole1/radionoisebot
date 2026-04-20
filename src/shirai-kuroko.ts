@@ -10,6 +10,10 @@ const isCreatorGuard = guard(isUserHasId(369810644))
 
 const hash2title = loadFromFile()
 
+const linkRegex = /^https:\/\/shikimori\.(me|one)\/(anime|manga)s\/|https:\/\/anilist.co\/(anime|manga)\//i;
+const parseShikiRegex = /^https:\/\/shikimori\.(?:me|one)\/(anime|manga)s\/.*?(\d+)/i
+const parseALRegex = /^https:\/\/anilist.co\/(anime|manga)\/.*?(\d+)/i
+
 shirai.on('msg::hashtag')
     .filter(
         ctx => !!ctx.msg.reply_to_message,
@@ -21,7 +25,7 @@ shirai.on('msg::hashtag')
             if (!reply.entities) return
             const title = reply.entities
                 .map(e => ({ ...e, text: reply.text!.substring(e.offset, e.offset + e.length) }))
-                .filter(e => e.type == 'url' && e.text.match(/^https:\/\/shikimori\.(me|one)\/(anime|manga)s\//i))[0].text
+                .filter(e => e.type == 'url' && e.text.match(linkRegex))[0].text
 
             hash2title.set(hashtag, title)
             await saveToFile(hash2title)
@@ -42,11 +46,11 @@ shirai.on(':is_automatic_forward', async ctx => {
             })
         }
         await ctx.reply(title, {
-            reply_markup: makeKeyboard(res.type, 'shiki', { id: res.id }),
+            reply_markup: makeKeyboard(res.type, res.service, { id: res.id }),
             reply_to_message_id: ctx.msg.message_id,
-            link_preview_options: {
+            link_preview_options: res.service === 'shikimori' ? {
                 url: `http://cdn.anime-recommend.ru/previews/${res.type == 'anime' ? '' : 'manga/'}${res.id}.jpg`
-            }
+            } : undefined
         })
     }
 })
@@ -69,11 +73,15 @@ async function saveToFile(map: Map<string, string>) {
 }
 
 function title2id(url: string) {
-    const match = url.match(/^https:\/\/shikimori\.(?:me|one)\/(anime|manga)s\/.*?(\d+)/)
+    let service = 'shiki';
+    let match = url.match(parseShikiRegex);
     if (!match) {
+        service = 'anilist';
+        match = url.match(parseALRegex);
         return null
     }
     return {
+        service,
         type: match[1],
         id: parseInt(match[2])
     }
