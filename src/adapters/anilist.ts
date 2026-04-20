@@ -108,7 +108,7 @@ class UnauthorizedAPI implements IUnauthorizedAPI {
             },
             mainTitle: result.title.romaji,
             secondaryTitle: result.title.english ?? '',
-            url: result.siteUrl
+            url: fixNotFullUrl(result.siteUrl, result.title.romaji)
         }))
         return adaptedResults
     }
@@ -239,3 +239,12 @@ export async function getToken(redirect_uri: URL, code: string): Promise<OAuthTo
     }
 }
 
+function fixNotFullUrl(url: string, romaji: string) {
+    if (url.match(/\//g)?.length != 4) {
+        return url;
+    }
+
+    const slug = romaji.replace(/[^A-Za-z0-9\s]/g, '').replace(/\s/g,'-');
+
+    return url + slug + '/';
+}
