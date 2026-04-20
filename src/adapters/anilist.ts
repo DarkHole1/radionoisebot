@@ -246,5 +246,5 @@ function fixNotFullUrl(url: string, romaji: string) {
 
     const slug = romaji.replace(/[^A-Za-z0-9\s]/g, '').replace(/\s/g,'-');
 
-    return url + slug + '/';
+    return [url, slug].join('/');
 }
