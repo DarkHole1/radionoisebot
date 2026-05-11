@@ -5,7 +5,7 @@ import { config } from "../config"
 import { RawTokenResponse } from "../models/token-response"
 import { ContentType, IAuthorizedAPI, IUnauthorizedAPI, OAuthToken, SearchParams, SearchResult } from "./types"
 
-const SHIKIMORI_URL = 'https://shikimori.one'
+const SHIKIMORI_URL = 'https://shikimori.io'
 const SHIKIMORI_GRAPHQL_URL = `${SHIKIMORI_URL}/api/graphql`
 
 const defaultOptions: APIOptions = {
