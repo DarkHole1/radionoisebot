@@ -89,6 +89,7 @@ The codebase uses thematic filenames inspired by the *Toaru* franchise:
 - [ ] Debounce inline search requests  
 - [ ] Improve Shikimori result previews  
 - [ ] Add MyAnimeList (MAL) support?
+- [ ] Add new mode support
 
 ---
 
