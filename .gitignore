@@ -3,3 +3,4 @@ node_modules
 test.py
 data
 anime-titles.dat
+src/**/*.js
