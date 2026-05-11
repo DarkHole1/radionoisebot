@@ -7,8 +7,19 @@ import { shirai } from "./shirai-kuroko"
 import { misaka } from "./misaka-mikoto"
 import { kakine } from './kakine-teitoku'
 import { tsuchimikado } from './tsuchimikado-motoharu'
+import { SocksProxyAgent } from 'socks-proxy-agent'
 
 let bot = new Bot(config.token)
+if (config.proxy) {
+    bot = new Bot(config.token, {
+        client: {
+            baseFetchConfig: {
+                agent: new SocksProxyAgent(config.proxy),
+                compress: true
+            }
+        }
+    })
+}
 
 bot.use(kakine)
 bot.use(misaka)
